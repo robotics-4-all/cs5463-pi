@@ -50,28 +50,32 @@ void printVoltageACOffset(void);
 void printOperationMode(void);
 void printTemperature(void);
 void performSingleComputation(void);
+void performContinuousComputation(void);
 
 double binConvert(Register * reg, double pow2);
 double range_1_sign(Register * reg);
 
 int main() {
   init();
+  /* performContinuousComputation(); */
+  /* delay(1000); */
   while(1) {
-    printEpsilon();
     performSingleComputation();
-    delay(200);
+    delay(1200);
+    /* waitForInterrupt(IRQ_PIN, -1); */
     printStatus();
     printIstantaneusCurrent();
     printIstantaneusVolt();
     printIstantaneusPower();
+    printRMSCurrent();
+    printRMSVolt();
+    printRealPower();
     printTemperature();
-    delay(1000);
   }
 }
 
 int initSpi(int channel, int speed){
   int spi =  wiringPiSPISetup (channel, speed) ;
-  // printf("Init is %d\n", spi);
   return spi;
 }
 
@@ -79,18 +83,19 @@ int spiWR(int channel, unsigned char *data, int len) {
   wiringPiSPIDataRW(channel, data, len);
 }
 
-void resetChip(int pin) {
-  pinMode(pin, OUTPUT);
-  digitalWrite(pin, 0);
+void resetChip(int rstPin) {
+  pinMode(rstPin, OUTPUT);
+  digitalWrite(rstPin, 0);
   delay(100);
-  digitalWrite(pin, 1);
+  digitalWrite(rstPin, 1);
   delay(1000);
 }
 
 void init(void) {
-  initSpi(SPI_CHANNEL, SPI_SPEED);
   wiringPiSetup();
+  pinMode(IRQ_PIN, INPUT);
   resetChip(RESET_PIN);
+  initSpi(SPI_CHANNEL, SPI_SPEED);
 }
 
 void setPage0(){
@@ -297,6 +302,12 @@ void performSingleComputation(void) {
   spiWR(0, buffer, 1);
 }
 
+void performContinuousComputation(void) {
+  unsigned char buffer[4];
+  buffer[0] = 0xE8;
+  spiWR(0, buffer, 1);
+}
+
 double binConvert(Register * reg, double pow2) {
   unsigned char mask = 0x80;
   double res=0;
@@ -327,7 +338,6 @@ double binConvert(Register * reg, double pow2) {
   } while (mask != 0);
   return res;
 }
-
 
 void writePage1(int reg, int value){
   unsigned char bufferPage[4] = {0x7E,0x00,0x00,0x1};
