@@ -57,8 +57,11 @@ double getIstantaneusCurrent(){
 
 double getIstantaneusVolt(){
   Register reg = getRegister(8);
+  double val, v = 0;
   /* printf("Insta-Volt: %0.9f\n", range_1_sign(&reg)); */
-  return range_1_sign(&reg);
+  val = range_1_sign(&reg);
+  v = val * 297;
+  return v;
 }
 
 double getIstantaneusPower(){
@@ -75,8 +78,11 @@ double getRealPower(void) {
 
 double getRMSVolt(void){
   Register reg = getRegister(12);
+  double val, vrms = 0;
   /* printf("RMS Volt: %0.9f\n", binConvert(&reg, 0.5)); */
-  return binConvert(&reg, 0.5);
+  val = binConvert(&reg, 0.5);
+  vrms = val * 297 / 0.707;
+  return vrms;
 }
 
 double getRMSCurrent(void){

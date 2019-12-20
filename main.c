@@ -39,8 +39,6 @@ int main() {
     rmsI = getRMSCurrent();
     printf("RMS Current: %f\n", rmsI);
     rmsV = getRMSVolt();
-    rmsV = rmsV * 297;
-    rmsV = rmsV / 0.707;
     printf("RMS Voltage: %f\n", rmsV);
     preal = getRealPower();
     printf("Real Power: %f\n", preal);
