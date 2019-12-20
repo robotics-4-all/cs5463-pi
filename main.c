@@ -6,11 +6,24 @@ int main() {
   /* delay(1000); */
   double i, v, p, rmsI, rmsV, preal, temp = 0.0;
   unsigned int cycleCount = 0;
+  double offsetI, offsetV, gainI, gainV, offsetIac, offsetVac = 0.0;
 
   setCycleCount(1000);
 
   cycleCount = getCycleCount();
+  gainI = getCurrentGain();
+  gainV = getVoltageGain();
+  offsetI = getCurrentOffset();
+  offsetV = getVoltageOffset();
+  offsetIac = getCurrentACOffset();
+  offsetVac = getVoltageACOffset();
   printf("Cycle Count: %d\n", cycleCount);
+  printf("Current Gain: %f\n", gainI);
+  printf("Voltage Gain: %f\n", gainV);
+  printf("Current Offset: %f\n", offsetI);
+  printf("Voltage Offset: %f\n", offsetV);
+  printf("Current AC Offset: %f\n", offsetIac);
+  printf("Voltage AC Offset: %f\n", offsetVac);
 
   while(1) {
     measureSync();

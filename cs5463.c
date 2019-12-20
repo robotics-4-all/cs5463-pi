@@ -91,10 +91,18 @@ double getCurrentOffset(void) {
   return range_1_sign(&reg);
 }
 
-double getVoltOffset(void) {
+void setCurrentOffset(int offset) {
+  writeRegister(1, offset);
+}
+
+double getVoltageOffset(void) {
   Register reg = getRegister(3);
   /* printf("Voltage offset: %0.9f\n", range_1_sign(&reg)); */
   return range_1_sign(&reg);
+}
+
+void setVoltageOffset(int offset) {
+  writeRegister(3, offset);
 }
 
 double getCurrentGain(void) {
@@ -103,10 +111,18 @@ double getCurrentGain(void) {
   return binConvert(&reg, 2);
 }
 
-double getVoltGain(void) {
+void setCurrentGain(unsigned int gain) {
+  writeRegister(2, (int)gain);
+}
+
+double getVoltageGain(void) {
   Register reg = getRegister(4);
   /* printf("Voltage Gain: %0.9f\n", binConvert(&reg, 2)); */
   return binConvert(&reg, 2);
+}
+
+void setVoltageGain(unsigned int gain) {
+  writeRegister(4, (int)gain);
 }
 
 double getTemperature(void) {
@@ -147,16 +163,28 @@ double getPowerOffset(void) {
   return range_1_sign(&reg);
 }
 
+void setPowerOffset(unsigned int offset) {
+  writeRegister(14, (int)offset);
+}
+
 double getCurrentACOffset(void) {
   Register reg = getRegister(16);
   /* printf("Current AC Offset: %0.9f\n", range_1_sign(&reg)); */
   return range_1_sign(&reg);
 }
 
+void setCurrentACOffset(unsigned int offset) {
+  writeRegister(16, (int)offset);
+}
+
 double getVoltageACOffset(void) {
   Register reg = getRegister(17);
   /* printf("Voltage AC Offset: %0.9f\n", range_1_sign(&reg)); */
   return range_1_sign(&reg);
+}
+
+void setVoltageACOffset(unsigned int offset) {
+  writeRegister(17, (int)offset);
 }
 
 void getOperationMode(void){
@@ -338,7 +366,7 @@ void writePage1(int reg, int value){
   const unsigned char mediumByte = (value & 0xFF00) >> 8;
   const unsigned char lowByte = value & 0xFF;
   unsigned char bufferReg[4] = {0x40 | (reg << 1), msb, mediumByte, lowByte};
-  printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]);
+  /* printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]); */
   spiWR(0, bufferPage, 4);
   spiWR(0, bufferReg, 4);
   bufferPage[3] = 0x0;  // Reset Page pointer.
@@ -395,6 +423,6 @@ void writeRegister(int reg, int value) {
   const unsigned char mediumByte = (value & 0xFF00) >> 8;
   const unsigned char lowByte = value & 0xFF;
   unsigned char bufferReg[4] = {0x40 | (reg << 1), msb, mediumByte, lowByte};
-  printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]);
+  /* printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]); */
   spiWR(0, bufferReg, 4);
 }
