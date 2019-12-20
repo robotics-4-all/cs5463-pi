@@ -1,3 +1,4 @@
+#include <time.h>
 #include "cs5463.h"
 
 int initSpi(int channel, int speed){
@@ -22,11 +23,30 @@ void init(void) {
   pinMode(IRQ_PIN, INPUT);
   resetChip(RESET_PIN);
   initSpi(SPI_CHANNEL, SPI_SPEED);
+  while (getCycleCount() == 0) {
+    delay(100);
+  }
+  setPage0();
 }
 
 void setPage0(){
   unsigned char buffer[4] = {0x7E,0x00,0x00,0x0};
   spiWR(0,buffer,4);
+}
+
+void setPage1() {
+  unsigned char buffer[4] = {0x7E,0x00,0x00,0x01};
+  spiWR(0, buffer, 4);
+}
+
+void setPage2() {
+  unsigned char buffer[4] = {0x7E,0x00,0x00,0x02};
+  spiWR(0, buffer, 4);
+}
+
+void setPage3() {
+  unsigned char buffer[4] = {0x7E,0x00,0x00,0x03};
+  spiWR(0, buffer, 4);
 }
 
 double getIstantaneusCurrent(){
@@ -105,6 +125,10 @@ unsigned int getCycleCount(void) {
   return val;
 }
 
+void setCycleCount(unsigned int cycles) {
+  writeRegister(5, (int)cycles);
+}
+
 double pulseRage(void) {
   Register reg = getRegister(6);
   /* printf("Pulse Rate-E: %0.9f\n", range_1_sign(&reg)); */
@@ -136,7 +160,6 @@ double getVoltageACOffset(void) {
 }
 
 void getOperationMode(void){
-  int row=6;
   Register status = getRegister(18);
   if (status.bytes[2] & 0x02){
     printf("Operation Mode: E2MODE\n");
@@ -170,8 +193,23 @@ void getOperationMode(void){
   }
 }
 
+int checkDataReady(void) {
+  Register status = getRegister(15);
+  if (status.bytes[1] & 0x80){
+    return 1;
+  }
+  return 0;
+}
+
+int checkConvReady(void) {
+  Register status = getRegister(15);
+  if (status.bytes[1] & 0x08){
+    return 1;
+  }
+  return 0;
+}
+
 void getStatus(void) {
-  int row=5;
   Register status = getRegister(15);
   if (status.bytes[1] & 0x80){
     printf("Status: DRDY\n");
@@ -239,6 +277,18 @@ double range_1_sign(Register * reg){
   return current;
 }
 
+void measureSync(void) {
+  performSingleComputation();
+  clock_t t = clock();
+  while (checkDataReady() == 0) {
+    /* printf("Data not ready - DRDY=0\n"); */
+    delay(1);
+  }
+  t = clock() - t;
+  double measTime = ((double)t) / CLOCKS_PER_SEC;
+  printf("Measurement ready after %f seconds\n", measTime * 10);
+}
+
 void performSingleComputation(void) {
   unsigned char buffer[4];
   buffer[0] = 0xE0;
@@ -287,10 +337,12 @@ void writePage1(int reg, int value){
   const unsigned char msb = (value & 0xFF0000) >> 16;
   const unsigned char mediumByte = (value & 0xFF00) >> 8;
   const unsigned char lowByte = value & 0xFF;
-  unsigned char bufferReg[4] = {0x40 | (reg << 1),msb, mediumByte, lowByte};
+  unsigned char bufferReg[4] = {0x40 | (reg << 1), msb, mediumByte, lowByte};
   printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]);
-  spiWR(0,bufferPage,4);
-  spiWR(0,bufferReg,4);
+  spiWR(0, bufferPage, 4);
+  spiWR(0, bufferReg, 4);
+  bufferPage[3] = 0x0;  // Reset Page pointer.
+  spiWR(0, bufferPage, 4);
 }
 
 void readPage1(void){
@@ -336,4 +388,13 @@ Register getRegister(byte reg) {
   result.bytes[2] = buffer[2];
   result.bytes[3] = buffer[3];
   return result;
+}
+
+void writeRegister(int reg, int value) {
+  const unsigned char msb = (value & 0xFF0000) >> 16;
+  const unsigned char mediumByte = (value & 0xFF00) >> 8;
+  const unsigned char lowByte = value & 0xFF;
+  unsigned char bufferReg[4] = {0x40 | (reg << 1), msb, mediumByte, lowByte};
+  printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]);
+  spiWR(0, bufferReg, 4);
 }

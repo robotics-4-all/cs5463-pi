@@ -19,6 +19,25 @@ union _Register {
 
 typedef union _Register Register;
 
+enum STATUS_TYPE {
+  DREADY = 0x80,
+  CRDY = 0x08,
+  IOR = 0x02,
+  VOR = 0x01,
+  IROR = 0x40,
+  VROR = 0x20,
+  EOR = 0x10,
+  IFAULT = 0x08,
+  VSAG = 0x04,
+  TUP = 0x80,
+  TOD = 0x40,
+  VOD = 0x10,
+  IOD = 0x08,
+  LSD = 0x04,
+  FUP = 0x02,
+  IC = 0x01
+} _statusType;
+
 void init(void);
 int initSpi(int channel, int speed);
 void resetChip(int pin);
@@ -41,6 +60,7 @@ double getCurrentGain(void);
 double getVoltGain(void);
 double pulseRage(void);
 unsigned int getCycleCount(void);
+void setCycleCount(unsigned int cycles);
 double getEpsilon(void);
 double getPowerOffset(void);
 void getStatus(void);
@@ -51,6 +71,8 @@ void getOperationMode(void);
 double getTemperature(void);
 void performSingleComputation(void);
 void performContinuousComputation(void);
+int checkDataReady(void);
+void measureSync(void);
 
 double binConvert(Register * reg, double pow2);
 double range_1_sign(Register * reg);
