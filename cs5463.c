@@ -74,13 +74,13 @@ double getRealPower(void) {
 }
 
 double getRMSVolt(void){
-  Register reg = getRegister(11);
+  Register reg = getRegister(12);
   /* printf("RMS Volt: %0.9f\n", binConvert(&reg, 0.5)); */
   return binConvert(&reg, 0.5);
 }
 
 double getRMSCurrent(void){
-  Register reg = getRegister(12);
+  Register reg = getRegister(11);
   /* printf("RMS Current: %0.9f\n", binConvert(&reg, 0.5)); */
   return binConvert(&reg, 0.5);
 }

@@ -8,7 +8,8 @@ int main() {
   unsigned int cycleCount = 0;
   double offsetI, offsetV, gainI, gainV, offsetIac, offsetVac = 0.0;
 
-  setCycleCount(1000);
+  setCycleCount(4000);
+  setVoltageGain(1 * 4194304);
 
   cycleCount = getCycleCount();
   gainI = getCurrentGain();
@@ -25,6 +26,7 @@ int main() {
   printf("Current AC Offset: %f\n", offsetIac);
   printf("Voltage AC Offset: %f\n", offsetVac);
 
+
   while(1) {
     measureSync();
     /* waitForInterrupt(IRQ_PIN, -1); */
@@ -37,11 +39,13 @@ int main() {
     rmsI = getRMSCurrent();
     printf("RMS Current: %f\n", rmsI);
     rmsV = getRMSVolt();
+    rmsV = rmsV * 297;
+    rmsV = rmsV / 0.707;
     printf("RMS Voltage: %f\n", rmsV);
     preal = getRealPower();
     printf("Real Power: %f\n", preal);
-    temp = getTemperature();
-    printf("Temperature: %f\n", temp);
+    printf("\n");
+    readAllRegister();
     printf("\n");
   }
 }
