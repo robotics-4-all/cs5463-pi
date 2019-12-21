@@ -13,8 +13,10 @@
 typedef unsigned char byte;
 
 union _Register {
-	unsigned int value;
-	byte bytes[4];
+  unsigned int pageNumber;
+  unsigned int number;
+  unsigned int value;
+  byte bytes[4];
 };
 
 typedef union _Register Register;
@@ -59,9 +61,9 @@ void setCurrentOffset(int offset);
 double getVoltageOffset(void);
 void setVoltageOffset(int offset);
 double getCurrentGain(void);
-void setCurrentGain(unsigned int gain);
+void setCurrentGain(double gain);
 double getVoltageGain(void);
-void setVoltageGain(unsigned int gain);
+void setVoltageGain(double gain);
 double pulseRage(void);
 unsigned int getCycleCount(void);
 void setCycleCount(unsigned int cycles);
@@ -77,8 +79,9 @@ void performSingleComputation(void);
 void performContinuousComputation(void);
 int checkDataReady(void);
 void measureSync(void);
+void enableHighPassFilter();
 
 double binConvert(Register * reg, double pow2);
-double range_1_sign(Register * reg);
+double _range_1_sign(Register * reg);
 
 #endif

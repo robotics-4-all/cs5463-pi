@@ -9,7 +9,9 @@ int main() {
   double offsetI, offsetV, gainI, gainV, offsetIac, offsetVac = 0.0;
 
   setCycleCount(4000);
-  setVoltageGain(1 * 4194304);
+  setCurrentGain(1.2);
+  setVoltageGain(2.4);
+  enableHighPassFilter();
 
   cycleCount = getCycleCount();
   gainI = getCurrentGain();
@@ -29,7 +31,6 @@ int main() {
 
   while(1) {
     measureSync();
-    /* waitForInterrupt(IRQ_PIN, -1); */
     i = getIstantaneusCurrent();
     printf("Instantaneous Current: %f\n", i);
     v = getIstantaneusVolt();
@@ -42,6 +43,8 @@ int main() {
     printf("RMS Voltage: %f\n", rmsV);
     preal = getRealPower();
     printf("Real Power: %f\n", preal);
+    temp = getTemperature();
+    printf("Temperature : %f\n", temp);
     printf("\n");
     readAllRegister();
     printf("\n");
