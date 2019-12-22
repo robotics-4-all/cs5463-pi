@@ -107,16 +107,14 @@ double getRealPower(void) {
 double getRMSVolt(void){
   Register reg = getRegister(12);
   double val = 0;
-  /* printf("RMS Volt: %0.9f\n", binConvert(&reg, 0.5)); */
-  val = binConvert(&reg, 0.5);
+  val = _binConvert(&reg, 0.5);
   /* val = val * 297 / 0.707; */
   return val;
 }
 
 double getRMSCurrent(void){
   Register reg = getRegister(11);
-  /* printf("RMS Current: %0.9f\n", binConvert(&reg, 0.5)); */
-  return binConvert(&reg, 0.5);
+  return _binConvert(&reg, 0.5);
 }
 
 double getCurrentOffset(void) {
@@ -141,8 +139,7 @@ void setVoltageOffset(int offset) {
 
 double getCurrentGain(void) {
   Register reg = getRegister(2);
-  /* printf("Current Gain: %0.9f\n", binConvert(&reg, 2)); */
-  return binConvert(&reg, 2);
+  return _binConvert(&reg, 2);
 }
 
 void setCurrentGain(double gain) {
@@ -152,8 +149,7 @@ void setCurrentGain(double gain) {
 
 double getVoltageGain(void) {
   Register reg = getRegister(4);
-  /* printf("Voltage Gain: %0.9f\n", binConvert(&reg, 2)); */
-  return binConvert(&reg, 2);
+  return _binConvert(&reg, 2);
 }
 
 void setVoltageGain(double gain) {
@@ -165,7 +161,7 @@ double getTemperature(void) {
   Register reg = getRegister(19);
   int sign = (reg.bytes[3] & 0x80) ? -1 : 1;
   reg.bytes[3] = reg.bytes[3] & 0x7F;
-  double val = binConvert(&reg, 128) * sign;;
+  double val = _binConvert(&reg, 128) * sign;;
   /* printf("Temperature: %0.9f\n", val); */
   return val;
 }
@@ -249,7 +245,7 @@ double getPeakVoltage(void) {
 double getReactivePower(void) {
   // Range 0<=Qtrig<=1
   Register reg = getRegister(24);
-  return binConvert(&reg, 2);
+  return _binConvert(&reg, 2);
 }
 
 double getPowerFactor(void) {
@@ -261,7 +257,7 @@ double getPowerFactor(void) {
 double getApparentPower(void) {
   // Range 0<=S<=1
   Register reg = getRegister(27);
-  return binConvert(&reg, 2);
+  return _binConvert(&reg, 2);
 }
 
 void getOperationMode(void){
@@ -374,32 +370,46 @@ void getStatus(void) {
   }
 }
 
-void getMask(void) {
+unsigned int getStatusMask(void) {
   Register countRegister = getRegister(26);
   unsigned int val = (((unsigned int)countRegister.bytes[1]) * 0x10000)+(((unsigned int)countRegister.bytes[2]) * 0x100)+(((unsigned int)countRegister.bytes[3]));
-  printf("Status mask: 0x%06d", val);
+  return val;
 }
 
 double _range_1_sign(Register * reg){
   int sign = reg->bytes[1] & 0x80;
   reg->bytes[1] = reg->bytes[1] & 0x7F;
-  double current = binConvert(reg, 1);
+  double current = _binConvert(reg, 1);
   if (reg->bytes[1] & 0x80){
     current = -current;
   }
   return current;
 }
 
-void measureSync(void) {
-  performSingleComputation();
-  clock_t t = clock();
+void waitDataReady(void) {
   while (checkDataReady() == 0) {
-    /* printf("Data not ready - DRDY=0\n"); */
     delay(1);
   }
-  t = clock() - t;
-  double measTime = ((double)t) / CLOCKS_PER_SEC;
-  printf("Measurement ready after %f seconds\n", measTime * 10);
+  unsigned int regNumber = 15;
+  unsigned char regBytes[3];
+  Register reg = getRegister(regNumber);
+
+  regBytes[0] = reg.bytes[1];
+  regBytes[1] = reg.bytes[2];
+  regBytes[2] = reg.bytes[3];
+  regBytes[0] = SET_BIT(regBytes[0], 7);  // DRDY
+  setRegister(regNumber, regBytes);
+}
+
+void waitConvReady(void) {
+  while (checkConvReady() == 0) {
+    delay(1);
+  }
+}
+
+void measureSync(void) {
+  performSingleComputation();
+  waitDataReady();
 }
 
 void performSingleComputation(void) {
@@ -435,7 +445,6 @@ void setIGain50(void) {
   regBytes[1] = reg.bytes[2];
   regBytes[2] = reg.bytes[3];
 
-  regBytes[0] = regBytes[0] | 0x01;  // Igain x50 in configuration register
   regBytes[0] = SET_BIT(regBytes[0], 0);  // Igain x10 in configuration register
   setRegister(regNumber, regBytes);
 }
@@ -453,7 +462,7 @@ void setIGain10(void) {
   setRegister(regNumber, regBytes);
 }
 
-double binConvert(Register * reg, double pow2) {
+double _binConvert(Register * reg, double pow2) {
   unsigned char mask = 0x80;
   double res=0;
 

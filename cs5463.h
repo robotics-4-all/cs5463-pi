@@ -115,23 +115,65 @@ void setCycleCount(unsigned int cycles);
 double getEpsilon(void);
 double getPowerOffset(void);
 void getStatus(void);
-void getMask(void);
+unsigned int getStatusMask(void);
 double getCurrentACOffset(void);
 double getVoltageACOffset(void);
 void getOperationMode(void);
 double getTemperature(void);
+
+/** Sends Single computation cycle StartConversion command.
+ */
 void performSingleComputation(void);
+
+/** Sends Continuous computation cycle StartConversion command.
+ */
 void performContinuousComputation(void);
+
+/** Sends SYNC0 command.
+ */
 void sendSync0(void);
+
+/** Sends SYNC1 command.
+ */
 void sendSync1(void);
+
+/** Check status of DREADY (Data Ready) bit in status register (15).
+ */
 int checkDataReady(void);
+
+/** Check status of TUP (Temperature updated) bit in status register (15).
+ */
 int checkTUP(void);
+
+/** Wait for Data Ready. This is a blocking operation.
+ *  Polling status of DRDY bit in status register (15).
+ */
+void waitDataReady(void);
+
+/** Wait for Conversation  Ready. This is a blocking operation.
+ *  Polling status of CRDY bit in status register (15).
+ */
+void waitConvReady(void);
+
+/** Performs synchronous measurement operation.
+ *  Sends PerformSingleCompution command and waits for data to be ready.
+ */
 void measureSync(void);
+
+/** Enables high-pass-filter or current and voltage channels.
+ *  Sets IHPF and VHPF bits in operational mode register (18).
+ */
 void enableHighPassFilter();
+
+/** Sets the gain of the current PGA to x10
+ */
 void setIGain10(void);
+
+/** Sets the gain of the current PGA to x50
+ */
 void setIGain50(void);
 
-double binConvert(Register * reg, double pow2);
+double _binConvert(Register * reg, double pow2);
 double _range_1_sign(Register * reg);
 
 #endif

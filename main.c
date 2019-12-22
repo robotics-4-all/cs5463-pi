@@ -1,11 +1,10 @@
+#include <time.h>
 #include "cs5463.h"
 
 int main() {
   init();
-  /* performContinuousComputation(); */
-  /* delay(1000); */
   double i, v, p, rmsI, rmsV, preal, temp = 0.0;
-  unsigned int cycleCount = 0;
+  unsigned int cycleCount, mask = 0;
   double offsetI, offsetV, gainI, gainV, offsetIac, offsetVac = 0.0;
   double q, avgQ = 0.0;
   double peakI, peakV, qReact, pf, s = 0.0;
@@ -15,7 +14,8 @@ int main() {
   setVoltageGain(1.0);
   enableHighPassFilter();
   setIGain10();
-  /* setVGain10(); */
+
+  performContinuousComputation();
 
   cycleCount = getCycleCount();
   gainI = getCurrentGain();
@@ -24,6 +24,8 @@ int main() {
   offsetV = getVoltageOffset();
   offsetIac = getCurrentACOffset();
   offsetVac = getVoltageACOffset();
+  mask = getStatusMask();
+  printf("Status mask: 0x%06d\n", mask);
   printf("Cycle Count: %d\n", cycleCount);
   printf("Current Gain: %f\n", gainI);
   printf("Voltage Gain: %f\n", gainV);
@@ -33,8 +35,17 @@ int main() {
   printf("Voltage AC Offset: %f\n", offsetVac);
   getOperationMode();
 
+  clock_t t = clock();
+  double measTime;
+
   while(1) {
-    measureSync();
+    waitDataReady();
+    t = clock() - t;
+    measTime = ((double)t) / CLOCKS_PER_SEC;
+    t = clock();
+    printf("Measurement ready after %f seconds\n", measTime * 10);
+    printf("----------------------------------------------\n");
+    /* waitDataReady(); */
     i = getIstantaneusCurrent();
     printf("Instantaneous Current: %f\n", i);
     v = getIstantaneusVolt();
