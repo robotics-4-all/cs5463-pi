@@ -2,7 +2,7 @@
 #include "cs5463.h"
 
 int initSpi(int channel, int speed){
-  int spi =  wiringPiSPISetup (channel, speed) ;
+  int spi =  wiringPiSPISetup(channel, speed) ;
   return spi;
 }
 
@@ -18,11 +18,26 @@ void resetChip(int rstPin) {
   delay(1000);
 }
 
+void softReset(void) {
+  unsigned char buffer[1];
+  buffer[0] = 0x80;
+  spiWR(0, buffer, 1);
+}
+
+void resetCom(void) {
+  sendSync1();
+  sendSync1();
+  sendSync1();
+  sendSync0();
+}
+
 void init(void) {
   wiringPiSetup();
   pinMode(IRQ_PIN, INPUT);
   resetChip(RESET_PIN);
   initSpi(SPI_CHANNEL, SPI_SPEED);
+  softReset();
+  resetCom();
   while (getCycleCount() == 0) {
     delay(100);
   }
@@ -39,7 +54,7 @@ void enableHighPassFilter() {
   regBytes[2] = reg.bytes[3];
 
   regBytes[2] = regBytes[2] | 0x60;  // IHPF and VHPF in operational mode reg.
-  setRegister(regNumber, regBytes);
+  /* setRegister(regNumber, regBytes); */
 }
 
 void setPage0(){
@@ -70,11 +85,11 @@ double getIstantaneusCurrent(){
 
 double getIstantaneusVolt(){
   Register reg = getRegister(8);
-  double val, v = 0;
+  double val = 0;
   /* printf("Insta-Volt: %0.9f\n", _range_1_sign(&reg)); */
   val = _range_1_sign(&reg);
-  v = val * 297;
-  return v;
+  /* val = val * 297 / 0.707; */
+  return val;
 }
 
 double getIstantaneusPower(){
@@ -91,11 +106,11 @@ double getRealPower(void) {
 
 double getRMSVolt(void){
   Register reg = getRegister(12);
-  double val, vrms = 0;
+  double val = 0;
   /* printf("RMS Volt: %0.9f\n", binConvert(&reg, 0.5)); */
   val = binConvert(&reg, 0.5);
-  vrms = val * 297 / 0.707;
-  return vrms;
+  /* val = val * 297 / 0.707; */
+  return val;
 }
 
 double getRMSCurrent(void){
@@ -200,12 +215,53 @@ void setCurrentACOffset(unsigned int offset) {
 
 double getVoltageACOffset(void) {
   Register reg = getRegister(17);
-  /* printf("Voltage AC Offset: %0.9f\n", _range_1_sign(&reg)); */
   return _range_1_sign(&reg);
 }
 
 void setVoltageACOffset(unsigned int offset) {
   writeRegister(17, (int)offset);
+}
+
+double getAverageReactivePower(void) {
+  // Range -1<=Qavg<=1
+  Register reg = getRegister(20);
+  return _range_1_sign(&reg);
+}
+
+double getInstantaneousReactivePower(void) {
+  // Range -1<=Q<=1
+  Register reg = getRegister(21);
+  return _range_1_sign(&reg);
+}
+
+double getPeakCurrent(void) {
+  // Range -1<=Ipeak<=1
+  Register reg = getRegister(22);
+  return _range_1_sign(&reg);
+}
+
+double getPeakVoltage(void) {
+  // Range -1<=Vpeak<=1
+  Register reg = getRegister(23);
+  return _range_1_sign(&reg);
+}
+
+double getReactivePower(void) {
+  // Range 0<=Qtrig<=1
+  Register reg = getRegister(24);
+  return binConvert(&reg, 2);
+}
+
+double getPowerFactor(void) {
+  // Range -1<=PF<=1
+  Register reg = getRegister(25);
+  return _range_1_sign(&reg);
+}
+
+double getApparentPower(void) {
+  // Range 0<=S<=1
+  Register reg = getRegister(27);
+  return binConvert(&reg, 2);
 }
 
 void getOperationMode(void){
@@ -358,6 +414,18 @@ void performContinuousComputation(void) {
   spiWR(0, buffer, 1);
 }
 
+void sendSync0(void) {
+  unsigned char buffer[4];
+  buffer[0] = 0xFE;
+  spiWR(0, buffer, 1);
+}
+
+void sendSync1(void) {
+  unsigned char buffer[4];
+  buffer[0] = 0xFF;
+  spiWR(0, buffer, 1);
+}
+
 void setIGain50(void) {
   unsigned int regNumber = 0;
   unsigned char regBytes[3];
@@ -368,6 +436,20 @@ void setIGain50(void) {
   regBytes[2] = reg.bytes[3];
 
   regBytes[0] = regBytes[0] | 0x01;  // Igain x50 in configuration register
+  regBytes[0] = SET_BIT(regBytes[0], 0);  // Igain x10 in configuration register
+  setRegister(regNumber, regBytes);
+}
+
+void setIGain10(void) {
+  unsigned int regNumber = 0;
+  unsigned char regBytes[3];
+  Register reg = getRegister(regNumber);
+
+  regBytes[0] = reg.bytes[1];
+  regBytes[1] = reg.bytes[2];
+  regBytes[2] = reg.bytes[3];
+
+  regBytes[0] = CLEAR_BIT(regBytes[0], 0);  // Igain x10 in configuration register
   setRegister(regNumber, regBytes);
 }
 
@@ -434,7 +516,7 @@ void readAllRegister(void) {
   spiWR(0, buffer, 4);
 
   for (i=0; i <= 31; i++){
-    printf("read register %d) --> ", i);
+    printf("Register %d --> ", i);
     readRegister(i);
   }
 }
@@ -463,7 +545,6 @@ Register getRegister(byte reg) {
 void setRegister(unsigned char reg, unsigned char* value) {
   // 0x40 -> write 1 to B6 for write control
   unsigned char bufferReg[4] = {0x40 | (reg << 1), value[0], value[1], value[2]};
-  /* printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]); */
   spiWR(0, bufferReg, 4);
 }
 
