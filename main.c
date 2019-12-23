@@ -13,7 +13,7 @@ int main() {
   setCurrentGain(1.0);
   setVoltageGain(1.0);
   enableHighPassFilter();
-  setIGain10();
+  setIGain50();
 
   performContinuousComputation();
 

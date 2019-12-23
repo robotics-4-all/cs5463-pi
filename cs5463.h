@@ -1,12 +1,12 @@
 #ifndef CS5463_H
-#define CS5464_H
+#define CS5463_H
 
 #include <stdio.h>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
 #define SPI_CHANNEL 0
-#define SPI_SPEED 500000
+#define SPI_SPEED 250000
 #define RESET_PIN 3
 #define IRQ_PIN 2
 
