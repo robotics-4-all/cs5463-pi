@@ -10,6 +10,10 @@
 #define RESET_PIN 3
 #define IRQ_PIN 2
 
+#define V_FACTOR 297
+#define I_FACTOR 1
+#define P_FACTOR 1
+
 #define SET_BIT(value, pos) (value |= (1U<< pos))
 #define CLEAR_BIT(value, pos) (value &= (~(1U<< pos)))
 

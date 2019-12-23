@@ -47,15 +47,15 @@ int main() {
     printf("----------------------------------------------\n");
     /* waitDataReady(); */
     i = getIstantaneusCurrent();
-    printf("Instantaneous Current: %f\n", i);
+    printf("Instantaneous Current: %f (%f Ampere)\n", i, i * I_FACTOR);
     v = getIstantaneusVolt();
-    printf("Instantaneous Voltage: %f\n", v);
+    printf("Instantaneous Voltage: %f (%f Volt)\n", v, v * V_FACTOR);
     p = getIstantaneusPower();
-    printf("Instantaneous Power: %f\n", p);
+    printf("Instantaneous Power: %f (%f )\n", p, p * P_FACTOR);
     rmsI = getRMSCurrent();
     printf("RMS Current: %f\n", rmsI);
     rmsV = getRMSVolt();
-    printf("RMS Voltage: %f\n", rmsV);
+    printf("RMS Voltage: %f\n", rmsV * V_FACTOR * 1.41421356237);
     preal = getRealPower();
     printf("Real Power: %f\n", preal);
     q = getInstantaneousReactivePower();

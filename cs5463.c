@@ -42,6 +42,7 @@ void init(void) {
     delay(100);
   }
   setPage0();
+  clearStatusRegister();
 }
 
 void enableHighPassFilter() {
@@ -386,6 +387,12 @@ double _range_1_sign(Register * reg){
   return current;
 }
 
+void clearStatusRegister(void) {
+  unsigned int regNumber = 15;
+  unsigned char regBytes[3] = {0xFF, 0xFF, 0xFF};
+  setRegister(regNumber, regBytes);
+}
+
 void waitDataReady(void) {
   while (checkDataReady() == 0) {
     delay(1);
@@ -522,11 +529,12 @@ void readPage1(void){
 void readAllRegister(void) {
   int i;
   unsigned char buffer[4] = {0x7E,0x00,0x00,0x0};
+  unsigned int regVal = 0;
   spiWR(0, buffer, 4);
 
   for (i=0; i <= 31; i++){
-    printf("Register %d --> ", i);
-    readRegister(i);
+    regVal = readRegister(i);
+    printf("[Register %d --> %06X]\n", i, regVal);
   }
 }
 
@@ -534,7 +542,7 @@ unsigned int readRegister(unsigned char reg){
   unsigned char buffer[4] = {reg<<1, 0xFF, 0xFF,0xFF};
 
   spiWR(0, buffer, 4);
-  printf("%02X%02X%02X\n", buffer[1], buffer[2], buffer[3]);
+  /* printf("%02X%02X%02X\n", buffer[1], buffer[2], buffer[3]); */
   return (((unsigned int)buffer[1]) << 16) + (((unsigned int)buffer[2]) << 8) + buffer[3];
 }
 
