@@ -45,7 +45,6 @@ int main() {
     t = clock();
     printf("Measurement ready after %f seconds\n", measTime * 10);
     printf("----------------------------------------------\n");
-    /* waitDataReady(); */
     i = getIstantaneusCurrent();
     printf("Instantaneous Current: %f (%f Ampere)\n", i, i * I_FACTOR);
     v = getIstantaneusVolt();
@@ -55,7 +54,7 @@ int main() {
     rmsI = getRMSCurrent();
     printf("RMS Current: %f\n", rmsI);
     rmsV = getRMSVolt();
-    printf("RMS Voltage: %f\n", rmsV * V_FACTOR * 1.41421356237);
+    printf("RMS Voltage: %f\n", rmsV * V_FACTOR_RMS);
     preal = getRealPower();
     printf("Real Power: %f\n", preal);
     q = getInstantaneousReactivePower();

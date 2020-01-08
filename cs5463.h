@@ -11,6 +11,7 @@
 #define IRQ_PIN 2
 
 #define V_FACTOR 297
+#define V_FACTOR_RMS 422.0777
 #define I_FACTOR 1
 #define P_FACTOR 1
 
@@ -176,6 +177,8 @@ void setIGain10(void);
 /** Sets the gain of the current PGA to x50
  */
 void setIGain50(void);
+
+void clearStatusRegister(void);
 
 double _binConvert(Register * reg, double pow2);
 double _range_1_sign(Register * reg);
