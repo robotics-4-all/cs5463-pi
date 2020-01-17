@@ -125,6 +125,9 @@ double getCurrentACOffset(void);
 double getVoltageACOffset(void);
 void getOperationMode(void);
 double getTemperature(void);
+double getHarmonicActivePower(void);
+double getFundamentalActivePower(void);
+double getFundamentalReactivePower(void);
 
 /** Sends Single computation cycle StartConversion command.
  */

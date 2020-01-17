@@ -261,6 +261,24 @@ double getApparentPower(void) {
   return _binConvert(&reg, 2);
 }
 
+double getHarmonicActivePower(void) {
+  // Range -1<=S<=1
+  Register reg = getRegister(29);
+  return _range_1_sign(&reg);
+}
+
+double getFundamentalActivePower(void) {
+  // Range -1<=S<=1
+  Register reg = getRegister(30);
+  return _range_1_sign(&reg);
+}
+
+double getFundamentalReactivePower(void) {
+  // Range -1<=S<=1
+  Register reg = getRegister(31);
+  return _range_1_sign(&reg);
+}
+
 void getOperationMode(void){
   Register status = getRegister(18);
   if (status.bytes[2] & 0x02){

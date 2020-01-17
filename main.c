@@ -1,5 +1,64 @@
 #include <time.h>
+#include <stdlib.h>
+#include <cjson/cJSON.h>
+
 #include "cs5463.h"
+#include "ipc.h"
+
+
+
+char *make_json(
+  float active,
+  float reactive,
+  float powerl1,
+  float current,
+  float voltage,
+  float phaseanglecurrentvoltagel1
+  )
+{
+  char *string = NULL;
+  cJSON *root  = cJSON_CreateObject();
+
+  cJSON_AddItemToObject(
+    root,
+    "active",
+    cJSON_CreateNumber(active)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "reactive",
+    cJSON_CreateNumber(active)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "powerl1",
+    cJSON_CreateNumber(powerl1)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "current",
+    cJSON_CreateNumber(current)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "voltage",
+    cJSON_CreateNumber(voltage)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "phaseanglecurrentvoltagel1",
+    cJSON_CreateNumber(phaseanglecurrentvoltagel1)
+    );
+
+  string = cJSON_Print(root);
+  if (string == NULL) {
+    fprintf(stderr, "Failed to print monitor.\n");
+  }
+   /* free all objects under root and root itself */
+   cJSON_Delete(root);
+   return string;
+}
+
 
 int main() {
   init();
@@ -38,6 +97,14 @@ int main() {
   clock_t t = clock();
   double measTime;
 
+  int sock_fd;
+  char buffer[512];
+  char *string = NULL;
+  connect_socket(&sock_fd);
+
+  strcpy (buffer, "Hello");
+
+
   while(1) {
     waitDataReady();
     t = clock() - t;
@@ -56,7 +123,7 @@ int main() {
     rmsV = getRMSVolt();
     printf("RMS Voltage: %f\n", rmsV * V_FACTOR_RMS);
     preal = getRealPower();
-    printf("Real Power: %f\n", preal);
+    printf("Active (Real) Power: %f\n", preal);
     q = getInstantaneousReactivePower();
     printf("Instantaneous Reactive Power (Q): %f\n", q);
     avgQ = getAverageReactivePower();
@@ -74,7 +141,10 @@ int main() {
     /* temp = getTemperature(); */
     /* printf("Temperature : %f\n", temp); */
     printf("\n");
-    readAllRegister();
+    /* readAllRegister(); */
     printf("\n");
+    string = make_json(preal, qReact, preal, rmsI, rmsV, 0.0);
+    printf("%s\n", string);
+    socket_send_data(&sock_fd, string);
   }
 }
