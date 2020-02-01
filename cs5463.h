@@ -205,4 +205,5 @@ void clearStatusRegister(void);
 double _binConvert(Register * reg, double pow2);
 double _range_1_sign(Register * reg);
 
+void readCalibrationParams(char *fpath);
 #endif

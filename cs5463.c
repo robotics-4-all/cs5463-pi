@@ -682,3 +682,23 @@ void writeRegister(int reg, int value) {
   /* printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]); */
   spiWR(0, bufferReg, 4);
 }
+
+void readCalibrationParams(char *fpath) {
+  unsigned int offsetI, offsetV, offsetVac, offsetIac;
+  FILE *fp;
+
+  fp = fopen(fpath, "r");
+  printf("[*] - Reading Calibration Params from file: %s\n", fpath);
+  fscanf(fp, "CurrentOffsetDC=%u\n", &offsetI);
+  fscanf(fp, "VoltageOffsetDC=%u\n", &offsetV);
+  fscanf(fp, "CurrentOffsetAC=%u\n", &offsetIac);
+  fscanf(fp, "VoltageOffsetAC=%u\n", &offsetVac);
+  printf("Current DC Offset: %u\n", offsetI);
+  printf("Voltage DC Offset: %u\n", offsetV);
+  printf("Current AC Offset: %u\n", offsetIac);
+  printf("Voltage AC Offset: %u\n", offsetVac);
+  setCurrentOffset(offsetI);
+  setVoltageOffset(offsetV);
+  setCurrentACOffset(offsetIac);
+  setVoltageACOffset(offsetVac);
+}
