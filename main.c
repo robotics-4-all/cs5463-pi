@@ -1,5 +1,6 @@
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <cjson/cJSON.h>
 
 #include "cs5463.h"
@@ -60,6 +61,27 @@ char *make_json(
 }
 
 
+void readCalibrationParams(char *fpath) {
+  unsigned int offsetI, offsetV, offsetVac, offsetIac;
+  FILE *fp;
+
+  fp = fopen(fpath, "r");
+  printf("[*] - Reading Calibration Params from file: %s\n", fpath);
+  fscanf(fp, "CurrentOffsetDC=%u\n", &offsetI);
+  fscanf(fp, "VoltageOffsetDC=%u\n", &offsetV);
+  fscanf(fp, "CurrentOffsetAC=%u\n", &offsetIac);
+  fscanf(fp, "VoltageOffsetAC=%u\n", &offsetVac);
+  printf("Current DC Offset: %u\n", offsetI);
+  printf("Voltage DC Offset: %u\n", offsetV);
+  printf("Current AC Offset: %u\n", offsetIac);
+  printf("Voltage AC Offset: %u\n", offsetVac);
+  setCurrentOffset(offsetI);
+  setVoltageOffset(offsetV);
+  setCurrentACOffset(offsetIac);
+  setVoltageACOffset(offsetVac);
+}
+
+
 int main() {
   init();
   double i, v, p, rmsI, rmsV, preal, temp = 0.0;
@@ -72,10 +94,8 @@ int main() {
   setCurrentGain(1.0);
   setVoltageGain(1.0);
 
-  setCurrentOffset(16643505);
-  setVoltageOffset(491583);
-  setCurrentACOffset(16776330);
-  setVoltageACOffset(0);
+  readCalibrationParams("/home/pi/.config/cs5463/calibration.txt");
+
   /* enableHighPassFilter(); */
   setIGain50();
 
@@ -107,14 +127,12 @@ int main() {
   char *string = NULL;
   connect_socket(&sock_fd);
 
-  strcpy (buffer, "Hello");
-
-
   while(1) {
     waitDataReady();
     t = clock() - t;
     measTime = ((double)t) / CLOCKS_PER_SEC;
     t = clock();
+    printf("----------------------------------------------\n");
     printf("Measurement ready after %f seconds\n", measTime * 10);
     printf("----------------------------------------------\n");
     i = getIstantaneusCurrent();
@@ -150,7 +168,6 @@ int main() {
     /* readAllRegister(); */
     printf("\n");
     string = make_json(preal, qReact, preal, rmsI, rmsV, 0.0);
-    printf("%s\n", string);
     socket_send_data(&sock_fd, string);
   }
 }
