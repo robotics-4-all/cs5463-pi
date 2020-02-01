@@ -71,7 +71,12 @@ int main() {
   setCycleCount(4000);
   setCurrentGain(1.0);
   setVoltageGain(1.0);
-  enableHighPassFilter();
+
+  setCurrentOffset(16643505);
+  setVoltageOffset(491583);
+  setCurrentACOffset(16776330);
+  setVoltageACOffset(0);
+  /* enableHighPassFilter(); */
   setIGain50();
 
   performContinuousComputation();
@@ -119,11 +124,12 @@ int main() {
     p = getIstantaneusPower();
     printf("Instantaneous Power: %f (%f )\n", p, p * P_FACTOR);
     rmsI = getRMSCurrent();
-    printf("RMS Current: %f\n", rmsI);
+    printf("RMS Current: %f - %f Ampere\n", rmsI, rmsI * I_FACTOR_RMS);
     rmsV = getRMSVolt();
-    printf("RMS Voltage: %f\n", rmsV * V_FACTOR_RMS);
+    printf("RMS Voltage: %f - %f Volt\n", rmsV, rmsV * V_FACTOR_RMS);
     preal = getRealPower();
-    printf("Active (Real) Power: %f\n", preal);
+    preal = (preal > 0.98 ? 0 : preal);
+    printf("Active (Real) Power: %f - %f Watt\n", preal, preal * V_FACTOR_RMS * I_FACTOR_RMS);
     q = getInstantaneousReactivePower();
     printf("Instantaneous Reactive Power (Q): %f\n", q);
     avgQ = getAverageReactivePower();

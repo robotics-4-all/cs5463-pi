@@ -1,5 +1,11 @@
 all: clean proc
 
+calibration: calib_obj
+	gcc -O0 -g2 calibration.o -o calibration -L. -lwiringPi -lcs5463
+
+calib_obj: cs5463
+	gcc -I. -O0 -g2  calibration.c -c -o calibration.o -L. #-L. -lcs5463
+
 proc: main
 	gcc -O0 -g2 main.o -o proc -L. -lwiringPi -lcs5463 -lipc -lcjson
 

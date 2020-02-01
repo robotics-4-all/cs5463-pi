@@ -11,9 +11,12 @@
 #define IRQ_PIN 2
 
 #define V_FACTOR 297
-#define V_FACTOR_RMS 422.0777
 #define I_FACTOR 1
+#define V_FACTOR_RMS 422.0777
+#define I_FACTOR_RMS 110.251924
 #define P_FACTOR 1
+#define V_OFFSET 0
+#define I_OFFSET 0
 
 #define SET_BIT(value, pos) (value |= (1U<< pos))
 #define CLEAR_BIT(value, pos) (value &= (~(1U<< pos)))
@@ -107,8 +110,12 @@ double getApparentPower(void);
 double getRMSVolt(void);
 double getRMSCurrent(void);
 double getCurrentOffset(void);
+unsigned int getCurrentOffsetInt(void);
+void getCurrentOffsetBytes(unsigned char *bytes);
 void setCurrentOffset(int offset);
 double getVoltageOffset(void);
+unsigned int getVoltageOffsetInt(void);
+void getVoltageOffsetBytes(unsigned char *bytes);
 void setVoltageOffset(int offset);
 double getCurrentGain(void);
 void setCurrentGain(double gain);
@@ -122,7 +129,11 @@ double getPowerOffset(void);
 void getStatus(void);
 unsigned int getStatusMask(void);
 double getCurrentACOffset(void);
+unsigned int getCurrentACOffsetInt(void);
 double getVoltageACOffset(void);
+unsigned int getVoltageACOffsetInt(void);
+void setCurrentACOffset(int offset);
+void setVoltageACOffset(int offset);
 void getOperationMode(void);
 double getTemperature(void);
 double getHarmonicActivePower(void);
@@ -180,6 +191,14 @@ void setIGain10(void);
 /** Sets the gain of the current PGA to x50
  */
 void setIGain50(void);
+
+void calibrationOffsetDC(void);
+
+void calibrationGainDC(void);
+
+void calibrationOffsetAC(void);
+
+void calibrationGainAC(void);
 
 void clearStatusRegister(void);
 

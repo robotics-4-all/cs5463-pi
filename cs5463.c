@@ -55,11 +55,24 @@ void enableHighPassFilter() {
   regBytes[2] = reg.bytes[3];
 
   regBytes[2] = regBytes[2] | 0x60;  // IHPF and VHPF in operational mode reg.
-  /* setRegister(regNumber, regBytes); */
+  setRegister(regNumber, regBytes);
+}
+
+void disableHighPassFilter() {
+  unsigned int regNumber = 18;
+  unsigned char regBytes[3];
+  Register reg = getRegister(18);
+
+  regBytes[0] = reg.bytes[1];
+  regBytes[1] = reg.bytes[2];
+  regBytes[2] = reg.bytes[3];
+
+  regBytes[2] = regBytes[2] & 0x9F;  // IHPF and VHPF in operational mode reg.
+  setRegister(regNumber, regBytes);
 }
 
 void setPage0(){
-  unsigned char buffer[4] = {0x7E, 0x00, 0x00, 0x0};
+  unsigned char buffer[4] = {0x7E, 0x00, 0x00, 0x00};
   spiWR(0, buffer, 4);
 }
 
@@ -105,23 +118,35 @@ double getRealPower(void) {
   return _range_1_sign(&reg);
 }
 
+double getRMSCurrent(void){
+  Register reg = getRegister(11);
+  return _range_1_sign(&reg);
+}
+
 double getRMSVolt(void){
   Register reg = getRegister(12);
   double val = 0;
   val = _binConvert(&reg, 0.5);
-  /* val = val * 297 / 0.707; */
   return val;
-}
-
-double getRMSCurrent(void){
-  Register reg = getRegister(11);
-  return _binConvert(&reg, 0.5);
 }
 
 double getCurrentOffset(void) {
   Register reg = getRegister(1);
-  /* printf("Current offset: %0.9f\n", _range_1_sign(&reg)); */
   return _range_1_sign(&reg);
+}
+
+unsigned int getCurrentOffsetInt(void){
+  Register reg = getRegister(1);
+  unsigned int val = (((unsigned int)reg.bytes[1]) * 0x10000)+(((unsigned int)reg.bytes[2]) * 0x100)+(((unsigned int)reg.bytes[3]));
+  return val;
+}
+
+void getCurrentOffsetBytes(unsigned char *bytes){
+  Register reg = getRegister(1);
+  bytes[0] = reg.bytes[1];
+  bytes[1] = reg.bytes[2];
+  bytes[2] = reg.bytes[3];
+  bytes[3] = 0;
 }
 
 void setCurrentOffset(int offset) {
@@ -130,8 +155,21 @@ void setCurrentOffset(int offset) {
 
 double getVoltageOffset(void) {
   Register reg = getRegister(3);
-  /* printf("Voltage offset: %0.9f\n", _range_1_sign(&reg)); */
   return _range_1_sign(&reg);
+}
+
+unsigned int getVoltageOffsetInt(void) {
+  Register reg = getRegister(3);
+  unsigned int val = (((unsigned int)reg.bytes[1]) * 0x10000)+(((unsigned int)reg.bytes[2]) * 0x100)+(((unsigned int)reg.bytes[3]));
+  return val;
+}
+
+void getVoltageOffsetBytes(unsigned char *bytes) {
+  Register reg = getRegister(3);
+  bytes[0] = reg.bytes[1];
+  bytes[1] = reg.bytes[2];
+  bytes[2] = reg.bytes[3];
+  bytes[3] = 0;
 }
 
 void setVoltageOffset(int offset) {
@@ -202,12 +240,17 @@ void setPowerOffset(unsigned int offset) {
 
 double getCurrentACOffset(void) {
   Register reg = getRegister(16);
-  /* printf("Current AC Offset: %0.9f\n", _range_1_sign(&reg)); */
   return _range_1_sign(&reg);
 }
 
-void setCurrentACOffset(unsigned int offset) {
-  writeRegister(16, (int)offset);
+unsigned int getCurrentACOffsetInt(void) {
+  Register reg = getRegister(16);
+  unsigned int val = (((unsigned int)reg.bytes[1]) * 0x10000)+(((unsigned int)reg.bytes[2]) * 0x100)+(((unsigned int)reg.bytes[3]));
+  return val;
+}
+
+void setCurrentACOffset(int offset) {
+  writeRegister(16, offset);
 }
 
 double getVoltageACOffset(void) {
@@ -215,8 +258,14 @@ double getVoltageACOffset(void) {
   return _range_1_sign(&reg);
 }
 
-void setVoltageACOffset(unsigned int offset) {
-  writeRegister(17, (int)offset);
+unsigned int getVoltageACOffsetInt(void) {
+  Register reg = getRegister(17);
+  unsigned int val = (((unsigned int)reg.bytes[1]) * 0x10000)+(((unsigned int)reg.bytes[2]) * 0x100)+(((unsigned int)reg.bytes[3]));
+  return val;
+}
+
+void setVoltageACOffset(int offset) {
+  writeRegister(17, offset);
 }
 
 double getAverageReactivePower(void) {
@@ -395,16 +444,6 @@ unsigned int getStatusMask(void) {
   return val;
 }
 
-double _range_1_sign(Register * reg){
-  int sign = reg->bytes[1] & 0x80;
-  reg->bytes[1] = reg->bytes[1] & 0x7F;
-  double current = _binConvert(reg, 1);
-  if (reg->bytes[1] & 0x80){
-    current = -current;
-  }
-  return current;
-}
-
 void clearStatusRegister(void) {
   unsigned int regNumber = 15;
   unsigned char regBytes[3] = {0xFF, 0xFF, 0xFF};
@@ -487,6 +526,50 @@ void setIGain10(void) {
   setRegister(regNumber, regBytes);
 }
 
+void calibrationOffsetDC(void) {
+  // |1|1|0|CAL4|CAL3|CAL2|CAL1|CAL0|
+  // Current and Voltage DC Offset: CAL[4:0] = 11001 = 0x19
+  unsigned char cal = 0x19;
+  unsigned char buffer[4] = {0xC0 | cal, 0xFF, 0xFF,0xFF};
+  spiWR(0, buffer, 1);
+  // Synchronous. Wait for DRDY bit to be set in Status Register.
+  // Alternatively, set the DRDY bit in Mask Register to output to INT pin.
+  waitDataReady();
+}
+
+void calibrationGainDC(void) {
+  // |1|1|0|CAL4|CAL3|CAL2|CAL1|CAL0|
+  // Current and Voltage DC GAIN: CAL[4:0] = 11010 = 0x1A
+  unsigned char cal = 0x1A;
+  unsigned char buffer[4] = {0xC0 | cal, 0xFF, 0xFF,0xFF};
+  spiWR(0, buffer, 1);
+  // Synchronous. Wait for DRDY bit to be set in Status Register.
+  // Alternatively, set the DRDY bit in Mask Register to output to INT pin.
+  waitDataReady();
+}
+
+void calibrationOffsetAC(void) {
+  // |1|1|0|CAL4|CAL3|CAL2|CAL1|CAL0|
+  // Current and Voltage AC Offset: CAL[4:0] = 11101 = 0x1D
+  unsigned char cal = 0x1D;
+  unsigned char buffer[4] = {0xC0 | cal, 0xFF, 0xFF,0xFF};
+  spiWR(0, buffer, 1);
+  // Synchronous. Wait for DRDY bit to be set in Status Register.
+  // Alternatively, set the DRDY bit in Mask Register to output to INT pin.
+  waitDataReady();
+}
+
+void calibrationGainAC(void) {
+  // |1|1|0|CAL4|CAL3|CAL2|CAL1|CAL0|
+  // Current and Voltage AC Offset: CAL[4:0] = 11110 = 0x1E
+  unsigned char cal = 0x1E;
+  unsigned char buffer[4] = {0xC0 | cal, 0xFF, 0xFF,0xFF};
+  spiWR(0, buffer, 1);
+  // Synchronous. Wait for DRDY bit to be set in Status Register.
+  // Alternatively, set the DRDY bit in Mask Register to output to INT pin.
+  waitDataReady();
+}
+
 double _binConvert(Register * reg, double pow2) {
   unsigned char mask = 0x80;
   double res=0;
@@ -518,13 +601,22 @@ double _binConvert(Register * reg, double pow2) {
   return res;
 }
 
+double _range_1_sign(Register * reg){
+  int sign = reg->bytes[1] & 0x80;
+  reg->bytes[1] = reg->bytes[1] & 0x7F;
+  double current = _binConvert(reg, 1);
+  if (reg->bytes[1] & 0x80){
+    current = -current;
+  }
+  return current;
+}
+
 void writePage1(int reg, int value){
   unsigned char bufferPage[4] = {0x7E,0x00,0x00,0x1};
   const unsigned char msb = (value & 0xFF0000) >> 16;
   const unsigned char mediumByte = (value & 0xFF00) >> 8;
   const unsigned char lowByte = value & 0xFF;
   unsigned char bufferReg[4] = {0x40 | (reg << 1), msb, mediumByte, lowByte};
-  /* printf("%02X %02X %02X %02X\n", bufferReg[0], bufferReg[1], bufferReg[2], bufferReg[3]); */
   spiWR(0, bufferPage, 4);
   spiWR(0, bufferReg, 4);
   bufferPage[3] = 0x0;  // Reset Page pointer.
@@ -560,7 +652,6 @@ unsigned int readRegister(unsigned char reg){
   unsigned char buffer[4] = {reg<<1, 0xFF, 0xFF,0xFF};
 
   spiWR(0, buffer, 4);
-  /* printf("%02X%02X%02X\n", buffer[1], buffer[2], buffer[3]); */
   return (((unsigned int)buffer[1]) << 16) + (((unsigned int)buffer[2]) << 8) + buffer[3];
 }
 
