@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   if(argc<2) {
     printf("Missing CycleCount argument!\n");
     exit(1);
-  }  //otherwise continue on our merry way....
+  }
   cycleCount = atoi(argv[1]);
 
   init();

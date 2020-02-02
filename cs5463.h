@@ -109,6 +109,7 @@ double getPowerFactor(void);
 double getApparentPower(void);
 double getRMSVolt(void);
 double getRMSCurrent(void);
+
 double getCurrentOffset(void);
 unsigned int getCurrentOffsetInt(void);
 void getCurrentOffsetBytes(unsigned char *bytes);
@@ -121,6 +122,7 @@ double getCurrentGain(void);
 void setCurrentGain(double gain);
 double getVoltageGain(void);
 void setVoltageGain(double gain);
+
 double pulseRage(void);
 unsigned int getCycleCount(void);
 void setCycleCount(unsigned int cycles);
@@ -192,12 +194,20 @@ void setIGain10(void);
  */
 void setIGain50(void);
 
+/** Perform DC Offset Calibration (Voltage + Current)
+ */
 void calibrationOffsetDC(void);
 
+/** Perform DC Gain Calibration (Voltage + Current)
+ */
 void calibrationGainDC(void);
 
+/** Perform AC Offset Calibration (Voltage + Current)
+ */
 void calibrationOffsetAC(void);
 
+/** Perform AC Gain Calibration (Voltage + Current)
+ */
 void calibrationGainAC(void);
 
 void clearStatusRegister(void);
