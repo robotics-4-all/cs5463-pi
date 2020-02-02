@@ -44,7 +44,7 @@ Calibration Parameters:
 - Voltage AC Offset: 0
 ```
 
-Take the values Calibration Parameters and place them in the calibration
+Take the values of Calibration Parameters and place them in the calibration
 cfg file at `~/.config/cs5463/calibration.txt`.
 
 ## State

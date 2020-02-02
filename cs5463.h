@@ -122,6 +122,12 @@ double getCurrentGain(void);
 void setCurrentGain(double gain);
 double getVoltageGain(void);
 void setVoltageGain(double gain);
+double getCurrentACOffset(void);
+unsigned int getCurrentACOffsetInt(void);
+double getVoltageACOffset(void);
+unsigned int getVoltageACOffsetInt(void);
+void setCurrentACOffset(int offset);
+void setVoltageACOffset(int offset);
 
 double pulseRage(void);
 unsigned int getCycleCount(void);
@@ -130,12 +136,6 @@ double getEpsilon(void);
 double getPowerOffset(void);
 void getStatus(void);
 unsigned int getStatusMask(void);
-double getCurrentACOffset(void);
-unsigned int getCurrentACOffsetInt(void);
-double getVoltageACOffset(void);
-unsigned int getVoltageACOffsetInt(void);
-void setCurrentACOffset(int offset);
-void setVoltageACOffset(int offset);
 void getOperationMode(void);
 double getTemperature(void);
 double getHarmonicActivePower(void);
@@ -185,6 +185,11 @@ void measureSync(void);
  *  Sets IHPF and VHPF bits in operational mode register (18).
  */
 void enableHighPassFilter();
+
+/** Disables high-pass-filter or current and voltage channels.
+ *  Sets IHPF and VHPF bits in operational mode register (18).
+ */
+void disableHighPassFilter();
 
 /** Sets the gain of the current PGA to x10
  */

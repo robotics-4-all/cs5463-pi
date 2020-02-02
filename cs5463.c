@@ -461,6 +461,7 @@ void waitDataReady(void) {
   regBytes[0] = reg.bytes[1];
   regBytes[1] = reg.bytes[2];
   regBytes[2] = reg.bytes[3];
+  // Clear DRDY bit in Status Register
   regBytes[0] = SET_BIT(regBytes[0], 7);  // DRDY
   setRegister(regNumber, regBytes);
 }
