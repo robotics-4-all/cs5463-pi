@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <cjson/cJSON.h>
+
 #include "ipc.h"
 
 #define SOCKET_FILE "/tmp/cs5463.sock"
@@ -12,6 +14,16 @@
 #define PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
 
 int connect_socket(int *socket_fd);
+
 int socket_send_data(int *socket_fd, char *buff);
+
+char *make_json(
+  float active,
+  float reactive,
+  float powerl1,
+  float current,
+  float voltage,
+  float phaseanglecurrentvoltagel1
+  );
 
 #endif

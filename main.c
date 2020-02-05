@@ -1,101 +1,57 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <cjson/cJSON.h>
 
 #include "cs5463.h"
 #include "ipc.h"
-
-
-
-char *make_json(
-  float active,
-  float reactive,
-  float powerl1,
-  float current,
-  float voltage,
-  float phaseanglecurrentvoltagel1
-  )
-{
-  char *string = NULL;
-  cJSON *root  = cJSON_CreateObject();
-
-  cJSON_AddItemToObject(
-    root,
-    "active",
-    cJSON_CreateNumber(active)
-    );
-  cJSON_AddItemToObject(
-    root,
-    "reactive",
-    cJSON_CreateNumber(active)
-    );
-  cJSON_AddItemToObject(
-    root,
-    "powerl1",
-    cJSON_CreateNumber(powerl1)
-    );
-  cJSON_AddItemToObject(
-    root,
-    "current",
-    cJSON_CreateNumber(current)
-    );
-  cJSON_AddItemToObject(
-    root,
-    "voltage",
-    cJSON_CreateNumber(voltage)
-    );
-  cJSON_AddItemToObject(
-    root,
-    "phaseanglecurrentvoltagel1",
-    cJSON_CreateNumber(phaseanglecurrentvoltagel1)
-    );
-
-  string = cJSON_Print(root);
-  if (string == NULL) {
-    fprintf(stderr, "Failed to print monitor.\n");
-  }
-   /* free all objects under root and root itself */
-   cJSON_Delete(root);
-   return string;
-}
 
 
 int main() {
   init();
   double i, v, p, rmsI, rmsV, preal, temp = 0.0;
   unsigned int cycleCount, mask = 0;
-  double offsetI, offsetV, gainI, gainV, offsetIac, offsetVac = 0.0;
+  double gainI, gainV = 0.0;
   double q, avgQ = 0.0;
   double peakI, peakV, qReact, pf, s = 0.0;
+  unsigned int* offsetI;
+  unsigned int* offsetV;
+  unsigned int* offsetIac;
+  unsigned int* offsetVac;
+
+  offsetI = malloc(sizeof(*offsetI));
+  offsetV = malloc(sizeof(*offsetV));
+  offsetIac = malloc(sizeof(*offsetIac));
+  offsetVac = malloc(sizeof(*offsetVac));
 
   setCycleCount(4000);
   setCurrentGain(1.0);
   setVoltageGain(1.0);
 
-  readCalibrationParams("/home/pi/.config/cs5463/calibration.txt");
+  readCalibrationParams(
+    "/home/pi/.config/cs5463/calibration.txt",
+    offsetI, offsetV, offsetIac, offsetVac
+    );
 
-  /* enableHighPassFilter(); */
+  // DC offset is not used when HPF (High Pass Filter) is enabled
+  /* setCurrentOffset(offsetI); */
+  /* setVoltageOffset(offsetV); */
+  setCurrentACOffset((int)*offsetIac);
+  setVoltageACOffset((int)*offsetVac);
+
+  enableHighPassFilter();
   setIGain50();
 
   performContinuousComputation();
 
   cycleCount = getCycleCount();
-  gainI = getCurrentGain();
-  gainV = getVoltageGain();
-  offsetI = getCurrentOffset();
-  offsetV = getVoltageOffset();
-  offsetIac = getCurrentACOffset();
-  offsetVac = getVoltageACOffset();
-  mask = getStatusMask();
-  printf("Status mask: 0x%06d\n", mask);
+  printf("Status mask: 0x%06d\n", getStatusMask());
   printf("Cycle Count: %d\n", cycleCount);
-  printf("Current Gain: %f\n", gainI);
-  printf("Voltage Gain: %f\n", gainV);
-  printf("Current Offset: %f\n", offsetI);
-  printf("Voltage Offset: %f\n", offsetV);
-  printf("Current AC Offset: %f\n", offsetIac);
-  printf("Voltage AC Offset: %f\n", offsetVac);
+  printf("Current Gain: %f\n", getCurrentGain());
+  printf("Voltage Gain: %f\n", getVoltageGain());
+  printf("Current Offset: %f\n", getCurrentOffset());
+  printf("Voltage Offset: %f\n", getVoltageOffset());
+  printf("Current AC Offset: %f\n", getCurrentACOffset());
+  printf("Voltage AC Offset: %f\n", getVoltageACOffset());
   getOperationMode();
 
   clock_t t = clock();
@@ -119,14 +75,14 @@ int main() {
     v = getIstantaneusVolt();
     printf("Instantaneous Voltage: %f (%f Volt)\n", v, v * V_FACTOR);
     p = getIstantaneusPower();
-    printf("Instantaneous Power: %f (%f )\n", p, p * P_FACTOR);
+    printf("Instantaneous Power: %f (%f Watt)\n", p, p * P_REAL_FACTOR);
     rmsI = getRMSCurrent();
-    printf("RMS Current: %f - %f Ampere\n", rmsI, rmsI * I_FACTOR_RMS);
+    printf("RMS Current: %f (%f Ampere)\n", rmsI, rmsI * I_FACTOR_RMS);
     rmsV = getRMSVolt();
-    printf("RMS Voltage: %f - %f Volt\n", rmsV, rmsV * V_FACTOR_RMS);
+    printf("RMS Voltage: %f (%f Volt)\n", rmsV, rmsV * V_FACTOR_RMS);
     preal = getRealPower();
     preal = (preal > 0.98 ? 0 : preal);
-    printf("Active (Real) Power: %f - %f Watt\n", preal, preal * V_FACTOR_RMS * I_FACTOR_RMS);
+    printf("Active (Real) Power: %f (%f Watt)\n", preal, preal * P_REAL_FACTOR_RMS);
     q = getInstantaneousReactivePower();
     printf("Instantaneous Reactive Power (Q): %f\n", q);
     avgQ = getAverageReactivePower();
@@ -146,6 +102,9 @@ int main() {
     printf("\n");
     /* readAllRegister(); */
     printf("\n");
+    preal = preal * P_REAL_FACTOR_RMS;
+    rmsI = rmsI * I_FACTOR_RMS;
+    rmsV = rmsV * V_FACTOR_RMS;
     string = make_json(preal, qReact, preal, rmsI, rmsV, 0.0);
     socket_send_data(&sock_fd, string);
   }

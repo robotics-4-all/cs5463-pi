@@ -93,40 +93,43 @@ void setPage3() {
 
 double getIstantaneusCurrent(){
   Register reg = getRegister(7);
-  /* printf("Insta-Current: %0.9f\n", _range_1_sign(&reg)); */
-  return _range_1_sign(&reg);
+  double val = _range_1_sign(&reg);
+  val =  val>= 0.99 ? 0 : val;
+  return val;
 }
 
 double getIstantaneusVolt(){
   Register reg = getRegister(8);
-  double val = 0;
-  /* printf("Insta-Volt: %0.9f\n", _range_1_sign(&reg)); */
-  val = _range_1_sign(&reg);
-  /* val = val * 297 / 0.707; */
+  double val = _range_1_sign(&reg);
+  val =  val>= 0.99 ? 0 : val;
   return val;
 }
 
 double getIstantaneusPower(){
   Register reg = getRegister(9);
-  /* printf("Insta-Power: %0.9f\n", _range_1_sign(&reg)); */
-  return _range_1_sign(&reg);
+  double val = _range_1_sign(&reg);
+  val =  val>= 0.99 ? 0 : val;
+  return val;
 }
 
 double getRealPower(void) {
   Register reg = getRegister(10);
-  /* printf("Real-Power: %0.9f\n", _range_1_sign(&reg)); */
-  return _range_1_sign(&reg);
+  double val = _range_1_sign(&reg);
+  val =  val>= 0.99 ? 0 : val;
+  return val;
 }
 
 double getRMSCurrent(void){
   Register reg = getRegister(11);
-  return _range_1_sign(&reg);
+  double val = _binConvert(&reg, 0.5);
+  val =  val>= 0.99 ? 0 : val;
+  return val;
 }
 
 double getRMSVolt(void){
   Register reg = getRegister(12);
-  double val = 0;
-  val = _binConvert(&reg, 0.5);
+  double val = _binConvert(&reg, 0.5);
+  val =  val>= 0.99 ? 0 : val;
   return val;
 }
 
@@ -684,22 +687,20 @@ void writeRegister(int reg, int value) {
   spiWR(0, bufferReg, 4);
 }
 
-void readCalibrationParams(char *fpath) {
-  unsigned int offsetI, offsetV, offsetVac, offsetIac;
+void readCalibrationParams(
+  char *fpath,
+  unsigned int *offsetI,
+  unsigned int *offsetV,
+  unsigned int *offsetIac,
+  unsigned int *offsetVac
+  )
+{
   FILE *fp;
 
   fp = fopen(fpath, "r");
   printf("[*] - Reading Calibration Params from file: %s\n", fpath);
-  fscanf(fp, "CurrentOffsetDC=%u\n", &offsetI);
-  fscanf(fp, "VoltageOffsetDC=%u\n", &offsetV);
-  fscanf(fp, "CurrentOffsetAC=%u\n", &offsetIac);
-  fscanf(fp, "VoltageOffsetAC=%u\n", &offsetVac);
-  printf("Current DC Offset: %u\n", offsetI);
-  printf("Voltage DC Offset: %u\n", offsetV);
-  printf("Current AC Offset: %u\n", offsetIac);
-  printf("Voltage AC Offset: %u\n", offsetVac);
-  setCurrentOffset(offsetI);
-  setVoltageOffset(offsetV);
-  setCurrentACOffset(offsetIac);
-  setVoltageACOffset(offsetVac);
+  fscanf(fp, "CurrentOffsetDC=%u\n", offsetI);
+  fscanf(fp, "VoltageOffsetDC=%u\n", offsetV);
+  fscanf(fp, "CurrentOffsetAC=%u\n", offsetIac);
+  fscanf(fp, "VoltageOffsetAC=%u\n", offsetVac);
 }

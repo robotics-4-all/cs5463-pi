@@ -2,6 +2,7 @@
 #define CS5463_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
@@ -10,13 +11,14 @@
 #define RESET_PIN 3
 #define IRQ_PIN 2
 
-#define V_FACTOR 297
-#define I_FACTOR 1
-#define V_FACTOR_RMS 422.0777
-#define I_FACTOR_RMS 110.251924
-#define P_FACTOR 1
+#define V_FACTOR 292
+#define I_FACTOR 77.94  // Might need *2
 #define V_OFFSET 0
 #define I_OFFSET 0
+#define V_FACTOR_RMS (V_FACTOR / 0.707)
+#define I_FACTOR_RMS (I_FACTOR / 0.707)
+#define P_REAL_FACTOR (V_FACTOR * I_FACTOR)
+#define P_REAL_FACTOR_RMS (V_FACTOR_RMS * I_FACTOR_RMS)
 
 #define SET_BIT(value, pos) (value |= (1U<< pos))
 #define CLEAR_BIT(value, pos) (value &= (~(1U<< pos)))
@@ -220,5 +222,12 @@ void clearStatusRegister(void);
 double _binConvert(Register * reg, double pow2);
 double _range_1_sign(Register * reg);
 
-void readCalibrationParams(char *fpath);
+void readCalibrationParams(
+  char *fpath,
+  unsigned int *offsetI,
+  unsigned int *offsetV,
+  unsigned int *offsetIac,
+  unsigned int *offsetVac
+  );
+
 #endif

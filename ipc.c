@@ -37,3 +37,55 @@ int socket_send_data(int *socket_fd, char *buff)
     return 1;
   }
 }
+
+char *make_json(
+  float active,
+  float reactive,
+  float powerl1,
+  float current,
+  float voltage,
+  float phaseanglecurrentvoltagel1
+  )
+{
+  char *string = NULL;
+  cJSON *root  = cJSON_CreateObject();
+
+  cJSON_AddItemToObject(
+    root,
+    "active",
+    cJSON_CreateNumber(active)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "reactive",
+    cJSON_CreateNumber(active)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "powerl1",
+    cJSON_CreateNumber(powerl1)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "current",
+    cJSON_CreateNumber(current)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "voltage",
+    cJSON_CreateNumber(voltage)
+    );
+  cJSON_AddItemToObject(
+    root,
+    "phaseanglecurrentvoltagel1",
+    cJSON_CreateNumber(phaseanglecurrentvoltagel1)
+    );
+
+  string = cJSON_Print(root);
+  if (string == NULL) {
+    fprintf(stderr, "Failed to print monitor.\n");
+  }
+   /* free all objects under root and root itself */
+   cJSON_Delete(root);
+   return string;
+}
