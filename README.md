@@ -47,6 +47,27 @@ Calibration Parameters:
 Take the values of Calibration Parameters and place them in the calibration
 cfg file at `~/.config/cs5463/calibration.txt`.
 
+A sample `calibration.txt` file would look like below:
+
+```
+CurrentOffsetDC=16643505
+VoltageOffsetDC=491583
+CurrentOffsetAC=16776330
+VoltageOffsetAC=0
+```
+
+## Define VFactor and IFactor Values
+
+In order to measure proper Voltage and Current values in SI (Volt/Ampere) the `VFactor` and `IFactor` constants have to be defined. These constants are unique per device and depend on the hardware setup (R_shunt, R1_divider, R2_divider, etc).
+In order to properly transform obtained measurements to SI, the values should be placed in the configuration file located at `~/.config/cs5463/config.txt`
+
+A sample `config.txt` file would look like below:
+
+```
+VFactor=292
+IFactor=77.94
+```
+
 ## State
 
 ### Implemented Features
