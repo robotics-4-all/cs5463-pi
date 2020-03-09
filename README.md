@@ -68,7 +68,7 @@ VFactor=292
 IFactor=77.94
 ```
 
-## State
+## Development Status
 
 ### Implemented Features
 
@@ -124,3 +124,11 @@ IFactor=77.94
 - setIGain10
 - enableHighPassFilter
 - clearStatusRegister
+
+## Roadmap
+
+**TODO**
+
+## Contributors
+
+- Konstaninos Panayiotou, **[klpanagi@gmail.com]**
