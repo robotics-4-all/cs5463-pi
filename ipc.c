@@ -4,6 +4,10 @@ int connect_socket(int *socket_fd)
 {
   int len;
   struct sockaddr_un sock_addr;
+  int enable = 1;
+
+  if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    error("setsockopt(SO_REUSEADDR) failed");
 
   if ((*socket_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
     perror("socket");

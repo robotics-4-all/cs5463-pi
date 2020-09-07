@@ -704,3 +704,19 @@ void readCalibrationParams(
   fscanf(fp, "CurrentOffsetAC=%u\n", offsetIac);
   fscanf(fp, "VoltageOffsetAC=%u\n", offsetVac);
 }
+
+void readConfigParams(
+  char *fpath,
+  unsigned int *vFactor,
+  unsigned int *iFactor,
+  unsigned int *iGain,
+  )
+{
+  FILE *fp;
+
+  fp = fopen(fpath, "r");
+  printf("[*] - Reading Calibration Params from file: %s\n", fpath);
+  fscanf(fp, "VFactor=%u\n", vFactor);
+  fscanf(fp, "IFactor=%u\n", iFactor);
+  fscanf(fp, "IGain=%u\n", iGain);
+}
