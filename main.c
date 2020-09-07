@@ -58,6 +58,7 @@ int main() {
   double measTime;
 
   int sock_fd;
+  int status;
   char buffer[512];
   char *string = NULL;
   connect_socket(&sock_fd);
@@ -106,6 +107,9 @@ int main() {
     rmsI = rmsI * I_FACTOR_RMS;
     rmsV = rmsV * V_FACTOR_RMS;
     string = make_json(preal, qReact, preal, rmsI, rmsV, 0.0);
-    socket_send_data(&sock_fd, string);
+    status = socket_send_data(&sock_fd, string);
+    if (status == 0) {
+      break;
+    }
   }
 }

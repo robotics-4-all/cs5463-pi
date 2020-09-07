@@ -709,7 +709,7 @@ void readConfigParams(
   char *fpath,
   unsigned int *vFactor,
   unsigned int *iFactor,
-  unsigned int *iGain,
+  unsigned int *iGain
   )
 {
   FILE *fp;

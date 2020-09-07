@@ -6,8 +6,8 @@ int connect_socket(int *socket_fd)
   struct sockaddr_un sock_addr;
   int enable = 1;
 
-  if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
-    error("setsockopt(SO_REUSEADDR) failed");
+  if (setsockopt(*socket_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    perror("setsockopt(SO_REUSEADDR) failed");
 
   if ((*socket_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
     perror("socket");
@@ -32,12 +32,12 @@ int connect_socket(int *socket_fd)
 int socket_send_data(int *socket_fd, char *buff)
 {
   if (send(*socket_fd, buff, strlen(buff)+1, 0) == -1) {
-    perror("send");
+    perror("SendData Failed!");
     return 0;
   }
   else
   {
-    printf ("Sent Data\n");
+    //printf("Sent Data\n");
     return 1;
   }
 }
