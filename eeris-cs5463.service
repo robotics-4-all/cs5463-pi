@@ -1,0 +1,17 @@
+[Unit]
+Description=Service for device app manager.
+# After=multi-user.target
+After=multi-user.target network.target eeris-feeder.service
+
+[Service]
+User=pi
+Type=idle
+ExecStart=/home/pi/cs5463-pi/launch.sh
+WorkingDirectory=/home/pi/cs5463-pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
