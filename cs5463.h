@@ -11,10 +11,8 @@
 #define RESET_PIN 3
 #define IRQ_PIN 2
 
-#define V_FACTOR 292
+#define V_FACTOR 319
 #define I_FACTOR 77.94  // Might need *2
-#define V_OFFSET 0
-#define I_OFFSET 0
 #define V_FACTOR_RMS (V_FACTOR / 0.707)
 #define I_FACTOR_RMS (I_FACTOR / 0.707)
 #define P_REAL_FACTOR (V_FACTOR * I_FACTOR)
@@ -79,7 +77,7 @@ Register getRegister(byte reg);
 void setRegister(unsigned char reg, unsigned char* value);
 unsigned int readRegister(unsigned char reg);
 void readAllRegister(void);
-void writeRegister(int reg, int value);
+void writeRegister(int reg, unsigned int value);
 void readPage1(void);
 void writePage1(int reg, int value);
 
@@ -115,11 +113,11 @@ double getRMSCurrent(void);
 double getCurrentOffset(void);
 unsigned int getCurrentOffsetInt(void);
 void getCurrentOffsetBytes(unsigned char *bytes);
-void setCurrentOffset(int offset);
+void setCurrentOffset(unsigned int offset);
 double getVoltageOffset(void);
 unsigned int getVoltageOffsetInt(void);
 void getVoltageOffsetBytes(unsigned char *bytes);
-void setVoltageOffset(int offset);
+void setVoltageOffset(unsigned int offset);
 double getCurrentGain(void);
 void setCurrentGain(double gain);
 double getVoltageGain(void);
@@ -128,8 +126,8 @@ double getCurrentACOffset(void);
 unsigned int getCurrentACOffsetInt(void);
 double getVoltageACOffset(void);
 unsigned int getVoltageACOffsetInt(void);
-void setCurrentACOffset(int offset);
-void setVoltageACOffset(int offset);
+void setCurrentACOffset(unsigned int offset);
+void setVoltageACOffset(unsigned int offset);
 
 double pulseRage(void);
 unsigned int getCycleCount(void);

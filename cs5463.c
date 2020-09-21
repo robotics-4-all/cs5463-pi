@@ -129,7 +129,7 @@ double getRMSCurrent(void){
 double getRMSVolt(void){
   Register reg = getRegister(12);
   double val = _binConvert(&reg, 0.5);
-  val =  val>= 0.99 ? 0 : val;
+  val = val >= 0.99 ? 0 : val;
   return val;
 }
 
@@ -152,7 +152,7 @@ void getCurrentOffsetBytes(unsigned char *bytes){
   bytes[3] = 0;
 }
 
-void setCurrentOffset(int offset) {
+void setCurrentOffset(unsigned int offset) {
   writeRegister(1, offset);
 }
 
@@ -175,7 +175,7 @@ void getVoltageOffsetBytes(unsigned char *bytes) {
   bytes[3] = 0;
 }
 
-void setVoltageOffset(int offset) {
+void setVoltageOffset(unsigned int offset) {
   writeRegister(3, offset);
 }
 
@@ -186,7 +186,7 @@ double getCurrentGain(void) {
 
 void setCurrentGain(double gain) {
   // 0.0<=Gain<=3.999
-  writeRegister(2, (int)(gain * 4194304));
+  writeRegister(2, (unsigned int)(gain * 4194304));
 }
 
 double getVoltageGain(void) {
@@ -196,7 +196,7 @@ double getVoltageGain(void) {
 
 void setVoltageGain(double gain) {
   // 0.0<=Gain<=3.999
-  writeRegister(4, (int)(gain * 4194304));
+  writeRegister(4, (unsigned int)(gain * 4194304));
 }
 
 double getTemperature(void) {
@@ -216,7 +216,7 @@ unsigned int getCycleCount(void) {
 }
 
 void setCycleCount(unsigned int cycles) {
-  writeRegister(5, (int)cycles);
+  writeRegister(5, cycles);
 }
 
 double pulseRage(void) {
@@ -238,7 +238,7 @@ double getPowerOffset(void) {
 }
 
 void setPowerOffset(unsigned int offset) {
-  writeRegister(14, (int)offset);
+  writeRegister(14, offset);
 }
 
 double getCurrentACOffset(void) {
@@ -252,7 +252,7 @@ unsigned int getCurrentACOffsetInt(void) {
   return val;
 }
 
-void setCurrentACOffset(int offset) {
+void setCurrentACOffset(unsigned int offset) {
   writeRegister(16, offset);
 }
 
@@ -267,7 +267,7 @@ unsigned int getVoltageACOffsetInt(void) {
   return val;
 }
 
-void setVoltageACOffset(int offset) {
+void setVoltageACOffset(unsigned int offset) {
   writeRegister(17, offset);
 }
 
@@ -607,9 +607,13 @@ double _binConvert(Register * reg, double pow2) {
 
 double _range_1_sign(Register * reg){
   int sign = reg->bytes[1] & 0x80;
-  reg->bytes[1] = reg->bytes[1] & 0x7F;
+  if (sign){
+    reg->bytes[1] = reg->bytes[1] ^ 0xFF;
+    reg->bytes[2] = reg->bytes[2] ^ 0xFF;
+    reg->bytes[3] = reg->bytes[3] ^ 0xFF;
+  }
   double current = _binConvert(reg, 1);
-  if (reg->bytes[1] & 0x80){
+  if (sign){
     current = -current;
   }
   return current;
@@ -678,7 +682,7 @@ void setRegister(unsigned char reg, unsigned char* value) {
   spiWR(0, bufferReg, 4);
 }
 
-void writeRegister(int reg, int value) {
+void writeRegister(int reg, unsigned int value) {
   const unsigned char msb = (value & 0xFF0000) >> 16;
   const unsigned char mediumByte = (value & 0xFF00) >> 8;
   const unsigned char lowByte = value & 0xFF;

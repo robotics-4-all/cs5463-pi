@@ -50,8 +50,10 @@ int main() {
   printf("Voltage Gain: %f\n", getVoltageGain());
   printf("Current Offset: %f\n", getCurrentOffset());
   printf("Voltage Offset: %f\n", getVoltageOffset());
-  printf("Current AC Offset: %f\n", getCurrentACOffset());
-  printf("Voltage AC Offset: %f\n", getVoltageACOffset());
+  printf("Current AC Offset: %f (%f)\n", getCurrentACOffset(),
+    getCurrentACOffset() * I_FACTOR_RMS);
+  printf("Voltage AC Offset: %f (%f)\n", getVoltageACOffset(),
+    getVoltageACOffset() * V_FACTOR_RMS);
   getOperationMode();
 
   clock_t t = clock();
@@ -108,8 +110,8 @@ int main() {
     rmsV = rmsV * V_FACTOR_RMS;
     string = make_json(preal, qReact, preal, rmsI, rmsV, 0.0);
     status = socket_send_data(&sock_fd, string);
-    if (status == 0) {
-      break;
-    }
+    /* if (status == 0) { */
+    /*   break; */
+    /* } */
   }
 }

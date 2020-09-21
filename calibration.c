@@ -20,10 +20,8 @@ void collect_calibration_params()
   printf("Cycle Count: %d\n", cycleCount);
   printf("Current Gain: %f\n", gainI);
   printf("Voltage Gain: %f\n", gainV);
-  printf("Current DC Offset: %f\n", offsetI * I_FACTOR);
-  printf("Voltage DC Offset: %f\n", offsetV * V_FACTOR);
-  printf("Current AC Offset: %f\n", offsetIac * I_FACTOR_RMS);
-  printf("Voltage AC Offset: %f\n", offsetVac * V_FACTOR_RMS);
+  printf("Current AC Offset: %f\n", offsetIac);
+  printf("Voltage AC Offset: %f\n", offsetVac);
 }
 
 
@@ -40,15 +38,14 @@ int main(int argc, char *argv[]) {
 
   setCurrentGain(1.0);
   setVoltageGain(1.0);
+  setCurrentACOffset(0);
+  setVoltageACOffset(0);
 
   // Max cycle counts to perform calibration.
   printf("[*] - Starting Calibration Process with CycleCount=%d\n", cycleCount);
   printf("[*] - This might take a while, depending of the value of CycleCount...\n");
   setCycleCount(cycleCount);
 
-  printf("[*] - Starting DC Offset Calibration process...\n");
-  calibrationOffsetDC();
-  printf("[*] - Finish DC Offset Calibration process.\n");
   printf("[*] - Starting AC Offset Calibration process...\n");
   calibrationOffsetAC();
   printf("[*] - Finish AC Offset Calibration process.\n");
@@ -57,8 +54,8 @@ int main(int argc, char *argv[]) {
 
   printf("\n");
   printf("Calibration Parameters:\n");
-  printf("- Current DC Offset: %d\n", getCurrentOffsetInt());
-  printf("- Voltage DC Offset: %d\n", getVoltageOffsetInt());
+  /* printf("- Current DC Offset: %d\n", getCurrentOffsetInt()); */
+  /* printf("- Voltage DC Offset: %d\n", getVoltageOffsetInt()); */
   printf("- Current AC Offset: %d\n", getCurrentACOffsetInt());
   printf("- Voltage AC Offset: %d\n", getVoltageACOffsetInt());
 }
