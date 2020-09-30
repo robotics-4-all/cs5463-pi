@@ -11,7 +11,7 @@
 #define RESET_PIN 3
 #define IRQ_PIN 2
 
-#define V_FACTOR 319
+#define V_FACTOR 293.5
 #define I_FACTOR 77.94  // Might need *2
 #define V_FACTOR_RMS (V_FACTOR / 0.707)
 #define I_FACTOR_RMS (I_FACTOR / 0.707)
