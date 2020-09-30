@@ -1,5 +1,5 @@
 [Unit]
-Description=Service for device app manager.
+Description=Service for cs5463 driver
 # After=multi-user.target
 After=multi-user.target network.target eeris-feeder.service
 
