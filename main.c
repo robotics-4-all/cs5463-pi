@@ -110,8 +110,8 @@ int main() {
     rmsV = rmsV * V_FACTOR_RMS;
     string = make_json(preal, qReact, preal, rmsI, rmsV, 0.0);
     status = socket_send_data(&sock_fd, string);
-    /* if (status == 0) { */
-    /*   break; */
-    /* } */
+    if (status == 0) {
+      break;
+    }
   }
 }
