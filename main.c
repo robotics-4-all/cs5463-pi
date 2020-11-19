@@ -67,48 +67,49 @@ int main() {
 
   while(1) {
     waitDataReady();
-    t = clock() - t;
-    measTime = ((double)t) / CLOCKS_PER_SEC;
-    t = clock();
-    printf("----------------------------------------------\n");
-    printf("Measurement ready after %f seconds\n", measTime * 10);
-    printf("----------------------------------------------\n");
+    /* t = clock() - t; */
+    /* measTime = ((double)t) / CLOCKS_PER_SEC; */
+    /* t = clock(); */
+    /* printf("----------------------------------------------\n"); */
+    /* printf("Measurement ready after %f seconds\n", measTime * 10); */
+    /* printf("----------------------------------------------\n"); */
+    printf("Measurement ready!");
     i = getIstantaneusCurrent();
-    printf("Instantaneous Current: %f (%f Ampere)\n", i, i * I_FACTOR);
+    /* printf("Instantaneous Current: %f (%f Ampere)\n", i, i * I_FACTOR); */
     v = getIstantaneusVolt();
-    printf("Instantaneous Voltage: %f (%f Volt)\n", v, v * V_FACTOR);
+    /* printf("Instantaneous Voltage: %f (%f Volt)\n", v, v * V_FACTOR); */
     p = getIstantaneusPower();
-    printf("Instantaneous Power: %f (%f Watt)\n", p, p * P_REAL_FACTOR);
+    /* printf("Instantaneous Power: %f (%f Watt)\n", p, p * P_REAL_FACTOR); */
     rmsI = getRMSCurrent();
-    printf("RMS Current: %f (%f Ampere)\n", rmsI, rmsI * I_FACTOR_RMS);
+    /* printf("RMS Current: %f (%f Ampere)\n", rmsI, rmsI * I_FACTOR_RMS); */
     rmsV = getRMSVolt();
-    printf("RMS Voltage: %f (%f Volt)\n", rmsV, rmsV * V_FACTOR_RMS);
+    /* printf("RMS Voltage: %f (%f Volt)\n", rmsV, rmsV * V_FACTOR_RMS); */
     preal = getRealPower();
     preal = (preal > 0.98 ? 0 : preal);
-    printf("Active (Real) Power: %f (%f Watt)\n", preal, preal * P_REAL_FACTOR_RMS);
+    /* printf("Active (Real) Power: %f (%f Watt)\n", preal, preal * P_REAL_FACTOR_RMS); */
     q = getInstantaneousReactivePower();
-    printf("Instantaneous Reactive Power (Q): %f\n", q);
+    /* printf("Instantaneous Reactive Power (Q): %f\n", q); */
     avgQ = getAverageReactivePower();
-    printf("Average Reactive Power (Qavg): %f\n", avgQ);
+    /* printf("Average Reactive Power (Qavg): %f\n", avgQ); */
     peakI = getPeakCurrent();
-    printf("Peak Current (Ipeak): %f\n", peakI);
+    /* printf("Peak Current (Ipeak): %f\n", peakI); */
     peakV = getPeakVoltage();
-    printf("Peak Voltage (Vpeak): %f\n", peakV);
+    /* printf("Peak Voltage (Vpeak): %f\n", peakV); */
     qReact = getReactivePower();
-    printf("Reactive Power (Qtrig): %f\n", qReact);
+    /* printf("Reactive Power (Qtrig): %f\n", qReact); */
     pf = getPowerFactor();
-    printf("Power Factor (PF): %f\n", pf);
+    /* printf("Power Factor (PF): %f\n", pf); */
     s = getApparentPower();
-    printf("Apparent Power (S): %f\n", s);
+    /* printf("Apparent Power (S): %f\n", s); */
     /* temp = getTemperature(); */
     /* printf("Temperature : %f\n", temp); */
-    printf("\n");
+    /* printf("\n"); */
     /* readAllRegister(); */
-    printf("\n");
+    /* printf("\n"); */
     preal = preal * P_REAL_FACTOR_RMS;
     rmsI = rmsI * I_FACTOR_RMS;
     rmsV = rmsV * V_FACTOR_RMS;
-    string = make_json(preal, qReact, preal, rmsI, rmsV, 0.0);
+    string = make_json(preal, avgQ, preal, rmsI, rmsV, 50.0);
     status = socket_send_data(&sock_fd, string);
     if (status == 0) {
       break;

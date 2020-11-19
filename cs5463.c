@@ -469,6 +469,29 @@ void waitDataReady(void) {
   setRegister(regNumber, regBytes);
 }
 
+int waitDataReady2(int timeout_ms) {
+  clock_t begin = clock();
+  double elapsed = 0.0;
+  while (checkDataReady() == 0) {
+    delay(10);
+    elapsed_ms = (double)(clock() - begin) * 1000;
+    if (elapsed > timeout_ms) {
+      return - 1;
+    }
+  }
+  unsigned int regNumber = 15;
+  unsigned char regBytes[3];
+  Register reg = getRegister(regNumber);
+
+  regBytes[0] = reg.bytes[1];
+  regBytes[1] = reg.bytes[2];
+  regBytes[2] = reg.bytes[3];
+  // Clear DRDY bit in Status Register
+  regBytes[0] = SET_BIT(regBytes[0], 7);  // DRDY
+  setRegister(regNumber, regBytes);
+  return 1;
+}
+
 void waitConvReady(void) {
   while (checkConvReady() == 0) {
     delay(1);

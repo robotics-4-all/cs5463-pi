@@ -62,7 +62,7 @@ char *make_json(
   cJSON_AddItemToObject(
     root,
     "reactive",
-    cJSON_CreateNumber(active)
+    cJSON_CreateNumber(reactive)
     );
   cJSON_AddItemToObject(
     root,

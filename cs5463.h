@@ -17,6 +17,8 @@
 #define I_FACTOR_RMS (I_FACTOR / 0.707)
 #define P_REAL_FACTOR (V_FACTOR * I_FACTOR)
 #define P_REAL_FACTOR_RMS (V_FACTOR_RMS * I_FACTOR_RMS)
+#define Q_FACTOR P_REAL_FACTOR
+#define Q_FACTOR_RMS P_REAL_FACTOR_RMS
 
 #define SET_BIT(value, pos) (value |= (1U<< pos))
 #define CLEAR_BIT(value, pos) (value &= (~(1U<< pos)))
@@ -170,6 +172,8 @@ int checkTUP(void);
  *  Polling status of DRDY bit in status register (15).
  */
 void waitDataReady(void);
+
+int waitDataReady2(int timeout_ms);
 
 /** Wait for Conversation  Ready. This is a blocking operation.
  *  Polling status of CRDY bit in status register (15).
