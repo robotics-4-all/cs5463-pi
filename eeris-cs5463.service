@@ -6,12 +6,13 @@ After=multi-user.target network.target eeris-feeder.service
 [Service]
 User=pi
 Type=idle
-ExecStart=/home/pi/cs5463-pi/launch.sh
+ExecStart=launch.sh
+## Set the working directory properly
 WorkingDirectory=/home/pi/cs5463-pi
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
-RestartSec=5s
+RestartSec=10s
 
 [Install]
 WantedBy=multi-user.target
