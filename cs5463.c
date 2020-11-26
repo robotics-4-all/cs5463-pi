@@ -470,12 +470,13 @@ void waitDataReady(void) {
 }
 
 int waitDataReady2(int timeout_ms) {
-  clock_t begin = clock();
+  clock_t start_t = clock();
+  clock_t end_t;
   double elapsed = 0.0;
   while (checkDataReady() == 0) {
     delay(1);
-    elapsed = (double)(clock() - begin) * 1000;
-    if (elapsed > timeout_ms) {
+    end_t = clock();
+    if (timediff(start_t, end_t) > timeout_ms) {
       return - 1;
     }
   }
@@ -490,6 +491,12 @@ int waitDataReady2(int timeout_ms) {
   regBytes[0] = SET_BIT(regBytes[0], 7);  // DRDY
   setRegister(regNumber, regBytes);
   return 1;
+}
+
+long timediff(clock_t t1, clock_t t2) {
+    long elapsed;
+    elapsed = ((double)t2 - t1) / CLOCKS_PER_SEC * 1000;
+    return elapsed;
 }
 
 void waitConvReady(void) {

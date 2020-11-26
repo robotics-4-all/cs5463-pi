@@ -6,13 +6,8 @@
 #include "ipc.h"
 
 
-int main() {
+void initialize_cs5463(){
   init();
-  double i, v, p, rmsI, rmsV, preal, temp = 0.0;
-  unsigned int cycleCount, mask = 0;
-  double gainI, gainV = 0.0;
-  double q, avgQ = 0.0;
-  double peakI, peakV, qReact, pf, s = 0.0;
   unsigned int* offsetI;
   unsigned int* offsetV;
   unsigned int* offsetIac;
@@ -55,6 +50,17 @@ int main() {
   printf("Voltage AC Offset: %f (%f)\n", getVoltageACOffset(),
     getVoltageACOffset() * V_FACTOR_RMS);
   getOperationMode();
+}
+
+
+int main() {
+  double i, v, p, rmsI, rmsV, preal, temp = 0.0;
+  unsigned int cycleCount, mask = 0;
+  double gainI, gainV = 0.0;
+  double q, avgQ = 0.0;
+  double peakI, peakV, qReact, pf, s = 0.0;
+
+  initialize_cs5463();
 
   clock_t t = clock();
   double measTime;
@@ -67,6 +73,12 @@ int main() {
 
   while(1) {
     waitDataReady();
+    status = waitDataReady2(30000);
+    if (status < 0) {
+      printf("Measurement timed out after 30 seconds!/n");
+      initialize_cs5463();
+      continue;
+    }
     /* t = clock() - t; */
     /* measTime = ((double)t) / CLOCKS_PER_SEC; */
     /* t = clock(); */
