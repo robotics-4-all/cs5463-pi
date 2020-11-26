@@ -73,7 +73,7 @@ int main() {
     /* printf("----------------------------------------------\n"); */
     /* printf("Measurement ready after %f seconds\n", measTime * 10); */
     /* printf("----------------------------------------------\n"); */
-    printf("Measurement ready!");
+    printf("Measurement ready!\n");
     i = getIstantaneusCurrent();
     /* printf("Instantaneous Current: %f (%f Ampere)\n", i, i * I_FACTOR); */
     v = getIstantaneusVolt();
