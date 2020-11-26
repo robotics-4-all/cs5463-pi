@@ -473,8 +473,8 @@ int waitDataReady2(int timeout_ms) {
   clock_t begin = clock();
   double elapsed = 0.0;
   while (checkDataReady() == 0) {
-    delay(10);
-    elapsed_ms = (double)(clock() - begin) * 1000;
+    delay(1);
+    elapsed = (double)(clock() - begin) * 1000;
     if (elapsed > timeout_ms) {
       return - 1;
     }

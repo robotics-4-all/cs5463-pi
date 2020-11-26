@@ -6,12 +6,12 @@ int connect_socket(int *socket_fd)
   struct sockaddr_un sock_addr;
   int enable = 1;
 
-  if (setsockopt(*socket_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
-    perror("setsockopt(SO_REUSEADDR) failed");
-
   if ((*socket_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
     perror("socket");
   }
+
+  if (setsockopt(*socket_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    perror("setsockopt(SO_REUSEADDR) failed");
 
   memset(&sock_addr, 0, sizeof(sock_addr));
   sock_addr.sun_family = AF_UNIX;
