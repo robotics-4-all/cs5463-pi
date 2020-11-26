@@ -219,6 +219,8 @@ void calibrationOffsetAC(void);
  */
 void calibrationGainAC(void);
 
+long timediff(clock_t t1, clock_t t2);
+
 void clearStatusRegister(void);
 
 double _binConvert(Register * reg, double pow2);

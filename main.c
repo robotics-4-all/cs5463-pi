@@ -7,6 +7,7 @@
 
 
 void initialize_cs5463(){
+  unsigned int cycleCount = 4000;
   init();
   unsigned int* offsetI;
   unsigned int* offsetV;
@@ -18,7 +19,7 @@ void initialize_cs5463(){
   offsetIac = malloc(sizeof(*offsetIac));
   offsetVac = malloc(sizeof(*offsetVac));
 
-  setCycleCount(4000);
+  setCycleCount(cycleCount);
   setCurrentGain(1.0);
   setVoltageGain(1.0);
 
@@ -55,7 +56,6 @@ void initialize_cs5463(){
 
 int main() {
   double i, v, p, rmsI, rmsV, preal, temp = 0.0;
-  unsigned int cycleCount, mask = 0;
   double gainI, gainV = 0.0;
   double q, avgQ = 0.0;
   double peakI, peakV, qReact, pf, s = 0.0;
