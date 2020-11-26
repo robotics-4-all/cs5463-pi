@@ -62,7 +62,6 @@ int main() {
 
   initialize_cs5463();
 
-  clock_t t = clock();
   double measTime;
 
   int sock_fd;
@@ -72,10 +71,9 @@ int main() {
   connect_socket(&sock_fd);
 
   while(1) {
-    waitDataReady();
     status = waitDataReady2(30000);
     if (status < 0) {
-      printf("Measurement timed out after 30 seconds!/n");
+      printf("Measurement timed out after 30 seconds!\n");
       initialize_cs5463();
       continue;
     }
@@ -87,37 +85,20 @@ int main() {
     /* printf("----------------------------------------------\n"); */
     printf("Measurement ready!\n");
     i = getIstantaneusCurrent();
-    /* printf("Instantaneous Current: %f (%f Ampere)\n", i, i * I_FACTOR); */
     v = getIstantaneusVolt();
-    /* printf("Instantaneous Voltage: %f (%f Volt)\n", v, v * V_FACTOR); */
     p = getIstantaneusPower();
-    /* printf("Instantaneous Power: %f (%f Watt)\n", p, p * P_REAL_FACTOR); */
     rmsI = getRMSCurrent();
-    /* printf("RMS Current: %f (%f Ampere)\n", rmsI, rmsI * I_FACTOR_RMS); */
     rmsV = getRMSVolt();
-    /* printf("RMS Voltage: %f (%f Volt)\n", rmsV, rmsV * V_FACTOR_RMS); */
     preal = getRealPower();
     preal = (preal > 0.98 ? 0 : preal);
-    /* printf("Active (Real) Power: %f (%f Watt)\n", preal, preal * P_REAL_FACTOR_RMS); */
     q = getInstantaneousReactivePower();
-    /* printf("Instantaneous Reactive Power (Q): %f\n", q); */
     avgQ = getAverageReactivePower();
-    /* printf("Average Reactive Power (Qavg): %f\n", avgQ); */
     peakI = getPeakCurrent();
-    /* printf("Peak Current (Ipeak): %f\n", peakI); */
     peakV = getPeakVoltage();
-    /* printf("Peak Voltage (Vpeak): %f\n", peakV); */
     qReact = getReactivePower();
-    /* printf("Reactive Power (Qtrig): %f\n", qReact); */
     pf = getPowerFactor();
-    /* printf("Power Factor (PF): %f\n", pf); */
     s = getApparentPower();
-    /* printf("Apparent Power (S): %f\n", s); */
-    /* temp = getTemperature(); */
-    /* printf("Temperature : %f\n", temp); */
-    /* printf("\n"); */
-    /* readAllRegister(); */
-    /* printf("\n"); */
+
     preal = preal * P_REAL_FACTOR_RMS;
     rmsI = rmsI * I_FACTOR_RMS;
     rmsV = rmsV * V_FACTOR_RMS;
