@@ -1,4 +1,4 @@
-CurrentOffsetDC=16643505
-VoltageOffsetDC=491583
-CurrentOffsetAC=16776330
-VoltageOffsetAC=0
+CurrentOffsetDC=0
+VoltageOffsetDC=0
+CurrentOffsetAC=16651474
+VoltageOffsetAC=16412724

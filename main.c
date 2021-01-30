@@ -29,8 +29,8 @@ void initialize_cs5463(){
     );
 
   // DC offset is not used when HPF (High Pass Filter) is enabled
-  /* setCurrentOffset(offsetI); */
-  /* setVoltageOffset(offsetV); */
+  setCurrentOffset((int)*offsetI);
+  setVoltageOffset((int)*offsetV);
   setCurrentACOffset((int)*offsetIac);
   setVoltageACOffset((int)*offsetVac);
 
@@ -46,9 +46,9 @@ void initialize_cs5463(){
   printf("Voltage Gain: %f\n", getVoltageGain());
   printf("Current Offset: %f\n", getCurrentOffset());
   printf("Voltage Offset: %f\n", getVoltageOffset());
-  printf("Current AC Offset: %f (%f)\n", getCurrentACOffset(),
+  printf("Current AC Offset: %d (%f)\n", getCurrentACOffsetInt(),
     getCurrentACOffset() * I_FACTOR_RMS);
-  printf("Voltage AC Offset: %f (%f)\n", getVoltageACOffset(),
+  printf("Voltage AC Offset: %d (%f)\n", getVoltageACOffsetInt(),
     getVoltageACOffset() * V_FACTOR_RMS);
   getOperationMode();
 }
@@ -83,14 +83,12 @@ int main() {
     /* printf("----------------------------------------------\n"); */
     /* printf("Measurement ready after %f seconds\n", measTime * 10); */
     /* printf("----------------------------------------------\n"); */
-    printf("Measurement ready\n\n");
-    i = getIstantaneusCurrent();
-    v = getIstantaneusVolt();
-    p = getIstantaneusPower();
+    i = getInstantaneusCurrent();
+    v = getInstantaneusVolt();
+    p = getRealPower();
     rmsI = getRMSCurrent();
     rmsV = getRMSVolt();
     preal = getRealPower();
-    preal = (preal > 0.98 ? 0 : preal);
     q = getInstantaneousReactivePower();
     avgQ = getAverageReactivePower();
     peakI = getPeakCurrent();
@@ -102,6 +100,9 @@ int main() {
     preal = preal * P_REAL_FACTOR_RMS;
     rmsI = rmsI * I_FACTOR_RMS;
     rmsV = rmsV * V_FACTOR_RMS;
+
+    printf("Measurement ready --> Irms=%f, Vrms=%f, Preal=%f\n\n", rmsI, rmsV, preal);
+
     string = make_json(preal, avgQ, preal, rmsI, rmsV, 50.0);
     status = socket_send_data(&sock_fd, string);
     if (status == 0) {

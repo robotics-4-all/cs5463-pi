@@ -91,45 +91,45 @@ void setPage3() {
   spiWR(0, buffer, 4);
 }
 
-double getIstantaneusCurrent(){
+double getInstantaneusCurrent(){
   Register reg = getRegister(7);
   double val = _range_1_sign(&reg);
-  val =  val>= 0.99 ? 0 : val;
+  val =  val>= 0.99 ? 0.99 : val;
   return val;
 }
 
-double getIstantaneusVolt(){
+double getInstantaneusVolt(){
   Register reg = getRegister(8);
   double val = _range_1_sign(&reg);
-  val =  val>= 0.99 ? 0 : val;
+  val =  val>= 0.99 ? 0.99 : val;
   return val;
 }
 
-double getIstantaneusPower(){
+double getInstantaneusPower(){
   Register reg = getRegister(9);
   double val = _range_1_sign(&reg);
-  val =  val>= 0.99 ? 0 : val;
+  val =  val>= 0.99 ? 0.99 : val;
   return val;
 }
 
 double getRealPower(void) {
   Register reg = getRegister(10);
   double val = _range_1_sign(&reg);
-  val =  val>= 0.99 ? 0 : val;
+  val =  val>= 0.99 ? 0.99 : val;
   return val;
 }
 
 double getRMSCurrent(void){
   Register reg = getRegister(11);
   double val = _binConvert(&reg, 0.5);
-  val =  val>= 0.99 ? 0 : val;
+  val =  val>= 0.99 ? 0.99 : val;
   return val;
 }
 
 double getRMSVolt(void){
   Register reg = getRegister(12);
   double val = _binConvert(&reg, 0.5);
-  val = val >= 0.99 ? 0 : val;
+  val = val >= 0.99 ? 0.99 : val;
   return val;
 }
 

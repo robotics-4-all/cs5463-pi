@@ -11,10 +11,10 @@
 #define RESET_PIN 3
 #define IRQ_PIN 2
 
-#define V_FACTOR 293.5
-#define I_FACTOR 77.94  // Might need *2
-#define V_FACTOR_RMS (V_FACTOR / 0.707)
-#define I_FACTOR_RMS (I_FACTOR / 0.707)
+#define V_FACTOR (416.13 / 0.707)
+#define I_FACTOR (106.50 / 0.707)
+#define V_FACTOR_RMS 416.13
+#define I_FACTOR_RMS 106.50
 #define P_REAL_FACTOR (V_FACTOR * I_FACTOR)
 #define P_REAL_FACTOR_RMS (V_FACTOR_RMS * I_FACTOR_RMS)
 #define Q_FACTOR P_REAL_FACTOR
@@ -98,9 +98,9 @@ void setPage2(void);
 /** Set Page register to point to Page3.
  */
 void setPage3(void);
-double getIstantaneusCurrent(void);
-double getIstantaneusVolt(void);
-double getIstantaneusPower(void);
+double getInstantaneusCurrent(void);
+double getInstantaneusVolt(void);
+double getInstantaneusPower(void);
 double getRealPower(void);
 double getInstantaneousReactivePower(void);
 double getAverageReactivePower(void);
