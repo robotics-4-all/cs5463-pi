@@ -7,7 +7,7 @@ calib_obj: cs5463
 	gcc -I. -O0 -g2  calibration.c -c -o calibration.o -L. #-L. -lcs5463
 
 proc: main
-	gcc -O0 -g2 main.o -o proc -L. -lwiringPi -lcs5463 -lipc -lcjson
+	gcc -O0 -g2 main.o -o proc -L. -lwiringPi -lcs5463 -lipc -lcjson -lc
 
 main: cs5463 ipc
 	gcc -I. -O0 -g2  main.c -c -o main.o -L. #-L. -lcs5463

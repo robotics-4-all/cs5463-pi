@@ -133,3 +133,8 @@ IFactor=77.94
 
 - Konstaninos Panayiotou, **[klpanagi@gmail.com]**
 - Iasonas Paraskeuopoulos, **[iaswnparaskev@gmail.com ]**
+
+## Allages Iordani
+- Oi parametroi tou calibration einai sto calfile.txt.
+- Gia calibration trexoume to ./proc me ta diakoptakia tou metrhth stis swstes 8eseis kai blepoume tis raw metrhseis.
+- Oi times pou dinei to programma stous karaxwrhtes twn offsets einai oles 0.

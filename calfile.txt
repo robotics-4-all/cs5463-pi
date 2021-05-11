@@ -1,0 +1,7 @@
+voff=0.001
+ioff=0.0001
+poff=1.3
+qoff=-35
+vfac=411.8
+ifac=106.14
+end

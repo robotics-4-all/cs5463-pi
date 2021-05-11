@@ -310,7 +310,7 @@ double getPowerFactor(void) {
 double getApparentPower(void) {
   // Range 0<=S<=1
   Register reg = getRegister(27);
-  return _binConvert(&reg, 2);
+  return _binConvert(&reg, 1);
 }
 
 double getHarmonicActivePower(void) {

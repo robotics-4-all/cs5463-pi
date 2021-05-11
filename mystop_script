@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sudo systemctl stop eeris-feeder.service
+sudo systemctl stop eeris-cs5463.service
+sudo systemctl stop eeris-mock-feeder.service
+echo "okkk"

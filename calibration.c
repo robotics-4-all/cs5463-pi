@@ -6,7 +6,7 @@
 void collect_calibration_params()
 {
   unsigned int cycleCount;
-  double offsetI, offsetV, gainI, gainV, offsetIac, offsetVac = 0.0;
+  double offsetI, offsetV, gainI, gainV, offsetIac=0.0, offsetVac = 0.0;
   unsigned char bytes[4];
 
   cycleCount = getCycleCount();
